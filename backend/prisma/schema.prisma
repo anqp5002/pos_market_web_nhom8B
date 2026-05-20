@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model VaiTro {
+  id        Int         @id @default(autoincrement())
+  name      String      @unique
+  nhanViens NhanVien[]
+}
+
+model NhanVien {
+  id        Int         @id @default(autoincrement())
+  username  String      @unique
+  password  String
+  fullName  String
+  roleId    Int
+  role      VaiTro      @relation(fields: [roleId], references: [id])
+  caLamViecs CaLamViec[]
+  donHangs  DonHang[]
+}
+
+model KhachHang {
+  id        Int         @id @default(autoincrement())
+  name      String
+  phone     String?     @unique
+  email     String?
+  donHangs  DonHang[]
+}
+
+model CaLamViec {
+  id             Int         @id @default(autoincrement())
+  nhanVienId     Int
+  nhanVien       NhanVien    @relation(fields: [nhanVienId], references: [id])
+  startTime      DateTime    @default(now())
+  endTime        DateTime?
+  openingBalance Float       @default(0)
+  closingBalance Float?
+  status         String      @default("OPEN") // OPEN, CLOSED
+  donHangs       DonHang[]
+}
+
+model DanhMuc {
+  id       Int        @id @default(autoincrement())
+  name     String     @unique
+  sanPhams SanPham[]
+}
+
+model SanPham {
+  id          Int              @id @default(autoincrement())
+  barcode     String           @unique
+  name        String
+  price       Float
+  stock       Int              @default(0)
+  categoryId  Int
+  category    DanhMuc          @relation(fields: [categoryId], references: [id])
+  chiTiets    ChiTietDonHang[]
+}
+
+model DonHang {
+  id          Int              @id @default(autoincrement())
+  nhanVienId  Int
+  nhanVien    NhanVien         @relation(fields: [nhanVienId], references: [id])
+  caLamViecId Int
+  caLamViec   CaLamViec        @relation(fields: [caLamViecId], references: [id])
+  khachHangId Int?
+  khachHang   KhachHang?       @relation(fields: [khachHangId], references: [id])
+  total       Float            @default(0)
+  status      String           @default("PENDING") // PENDING, COMPLETED, CANCELLED
+  createdAt   DateTime         @default(now())
+  chiTiets    ChiTietDonHang[]
+  giaoDichs   GiaoDich[]
+  hoaDon      HoaDon?
+}
+
+model ChiTietDonHang {
+  id         Int      @id @default(autoincrement())
+  donHangId  Int
+  donHang    DonHang  @relation(fields: [donHangId], references: [id])
+  sanPhamId  Int
+  sanPham    SanPham  @relation(fields: [sanPhamId], references: [id])
+  quantity   Int
+  price      Float
+}
+
+model PhuongThucThanhToan {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique // CASH, CREDIT_CARD, QR_CODE
+  giaoDichs GiaoDich[]
+}
+
+model GiaoDich {
+  id          Int                 @id @default(autoincrement())
+  donHangId   Int
+  donHang     DonHang             @relation(fields: [donHangId], references: [id])
+  ptttId      Int
+  pttt        PhuongThucThanhToan @relation(fields: [ptttId], references: [id])
+  amount      Float
+  status      String              @default("SUCCESS") // SUCCESS, FAILED
+  createdAt   DateTime            @default(now())
+}
+
+model HoaDon {
+  id            Int      @id @default(autoincrement())
+  donHangId     Int      @unique
+  donHang       DonHang  @relation(fields: [donHangId], references: [id])
+  invoiceNumber String   @unique
+  printedAt     DateTime @default(now())
+}
