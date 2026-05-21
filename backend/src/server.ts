@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import productRoutes from './routes/product.routes';
 import categoryRoutes from './routes/category.routes';
 import orderRoutes from './routes/order.routes';
+import transactionRoutes from './routes/transaction.routes';
 
 dotenv.config();
 
@@ -30,6 +31,8 @@ app.get('/api/health', (_req, res) => {
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/transactions', transactionRoutes);
+
 
 
 // Start server

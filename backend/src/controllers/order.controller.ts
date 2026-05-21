@@ -61,3 +61,14 @@ export const updateStatus = async (req: Request, res: Response) => {
     res.status(400).json({ error: err.message || 'Lỗi cập nhật trạng thái đơn hàng' });
   }
 };
+
+// POST /api/orders/:id/pay
+export const pay = async (req: Request, res: Response) => {
+  try {
+    const result = await orderService.processPayment(Number(req.params.id), req.body);
+    res.json(result);
+  } catch (err: any) {
+    console.error('Error processing payment:', err);
+    res.status(400).json({ error: err.message || 'Lỗi xử lý thanh toán' });
+  }
+};

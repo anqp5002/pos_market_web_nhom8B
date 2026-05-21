@@ -1,5 +1,7 @@
 import prisma from '../config/prisma';
 import { CreateOrderInput } from '../validators/order.validator';
+import { createInvoice } from './invoice.service';
+
 
 // Tạo đơn hàng mới với Prisma transaction (đảm bảo tính toàn vẹn dữ liệu)
 export const createOrder = async (data: CreateOrderInput) => {
@@ -210,5 +212,88 @@ export const updateOrderStatus = async (id: number, status: string) => {
     where: { id },
     data: { status },
     include: { chiTiets: true },
+  });
+};
+
+// Xử lý thanh toán đơn hàng (Giao dịch & Hóa đơn)
+export const processPayment = async (orderId: number, data: { ptttId: number; amount: number }) => {
+  const { ptttId, amount } = data;
+
+  return prisma.$transaction(async (tx) => {
+    // 1. Kiểm tra đơn hàng tồn tại và đang PENDING
+    const order = await tx.donHang.findUnique({
+      where: { id: orderId },
+      include: {
+        caLamViec: true,
+      },
+    });
+
+    if (!order) {
+      throw new Error('Đơn hàng không tồn tại');
+    }
+    if (order.status !== 'PENDING') {
+      throw new Error(`Đơn hàng đã ở trạng thái ${order.status}, không thể thanh toán`);
+    }
+
+    // 2. Kiểm tra ca làm việc của đơn hàng đang mở
+    if (order.caLamViec.status !== 'OPEN') {
+      throw new Error('Ca làm việc của đơn hàng này đã đóng, không thể thanh toán');
+    }
+
+    // 3. Kiểm tra phương thức thanh toán tồn tại
+    const paymentMethod = await tx.phuongThucThanhToan.findUnique({
+      where: { id: ptttId },
+    });
+    if (!paymentMethod) {
+      throw new Error('Phương thức thanh toán không hợp lệ');
+    }
+
+    // 4. Kiểm tra số tiền khách trả có đủ không
+    if (amount < order.total) {
+      throw new Error(
+        `Số tiền thanh toán không đủ (Yêu cầu: ${order.total} ₫, Khách trả: ${amount} ₫)`
+      );
+    }
+
+    // 5. Tạo giao dịch thanh toán thành công
+    const transaction = await tx.giaoDich.create({
+      data: {
+        donHangId: order.id,
+        ptttId,
+        amount,
+        status: 'SUCCESS',
+      },
+    });
+
+    // 6. Tự động xuất hóa đơn
+    const invoice = await createInvoice(order.id, tx);
+
+    // 7. Cập nhật trạng thái đơn hàng thành COMPLETED
+    const updatedOrder = await tx.donHang.update({
+      where: { id: order.id },
+      data: { status: 'COMPLETED' },
+      include: {
+        chiTiets: {
+          include: {
+            sanPham: true,
+          },
+        },
+        nhanVien: true,
+        khachHang: true,
+        giaoDichs: {
+          include: {
+            pttt: true,
+          },
+        },
+        hoaDon: true,
+      },
+    });
+
+    return {
+      order: updatedOrder,
+      transaction,
+      invoice,
+      change: amount - order.total, // Tiền thừa trả khách
+    };
   });
 };
