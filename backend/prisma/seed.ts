@@ -198,6 +198,17 @@ async function main() {
   }
 
   console.log('✅ Payment methods created');
+
+  // Tạo Ca Làm Việc mở mặc định cho admin
+  await prisma.caLamViec.create({
+    data: {
+      nhanVienId: admin.id,
+      openingBalance: 1000000, // 1,000,000 VND
+      status: 'OPEN',
+    },
+  });
+  console.log('✅ Default open shift created for admin');
+
   console.log('🎉 Seed completed!');
 }
 

@@ -1,0 +1,214 @@
+import prisma from '../config/prisma';
+import { CreateOrderInput } from '../validators/order.validator';
+
+// Tạo đơn hàng mới với Prisma transaction (đảm bảo tính toàn vẹn dữ liệu)
+export const createOrder = async (data: CreateOrderInput) => {
+  const { nhanVienId, caLamViecId, khachHangId, items } = data;
+
+  return prisma.$transaction(async (tx) => {
+    // 1. Kiểm tra nhân viên tồn tại
+    const employee = await tx.nhanVien.findUnique({
+      where: { id: nhanVienId },
+    });
+    if (!employee) {
+      throw new Error(`Nhân viên với ID ${nhanVienId} không tồn tại`);
+    }
+
+    // 2. Kiểm tra ca làm việc tồn tại và đang mở
+    const shift = await tx.caLamViec.findUnique({
+      where: { id: caLamViecId },
+    });
+    if (!shift) {
+      throw new Error(`Ca làm việc với ID ${caLamViecId} không tồn tại`);
+    }
+    if (shift.status !== 'OPEN') {
+      throw new Error('Ca làm việc này đã đóng, không thể tạo đơn hàng');
+    }
+
+    // 3. Kiểm tra khách hàng (nếu có truyền)
+    if (khachHangId) {
+      const customer = await tx.khachHang.findUnique({
+        where: { id: khachHangId },
+      });
+      if (!customer) {
+        throw new Error(`Khách hàng với ID ${khachHangId} không tồn tại`);
+      }
+    }
+
+    // 4. Kiểm tra danh sách sản phẩm và lượng tồn kho
+    const productIds = items.map((i) => i.sanPhamId);
+    const dbProducts = await tx.sanPham.findMany({
+      where: { id: { in: productIds } },
+    });
+
+    if (dbProducts.length !== productIds.length) {
+      throw new Error('Một số sản phẩm trong đơn hàng không tồn tại');
+    }
+
+    let calculatedTotal = 0;
+
+    // Tạo cấu trúc lưu thông tin chi tiết các mặt hàng để insert
+    const orderItemsToCreate = [];
+
+    for (const item of items) {
+      const product = dbProducts.find((p) => p.id === item.sanPhamId)!;
+
+      // Kiểm tra số lượng tồn kho
+      if (product.stock < item.quantity) {
+        throw new Error(
+          `Sản phẩm "${product.name}" không đủ hàng tồn kho (Yêu cầu: ${item.quantity}, Hiện có: ${product.stock})`
+        );
+      }
+
+      // Giảm tồn kho sản phẩm
+      await tx.sanPham.update({
+        where: { id: product.id },
+        data: {
+          stock: {
+            decrement: item.quantity,
+          },
+        },
+      });
+
+      // Tính tổng tiền cho sản phẩm này
+      const itemPrice = product.price;
+      calculatedTotal += itemPrice * item.quantity;
+
+      orderItemsToCreate.push({
+        sanPhamId: item.sanPhamId,
+        quantity: item.quantity,
+        price: itemPrice,
+      });
+    }
+
+    // 5. Tạo đơn hàng mới
+    const order = await tx.donHang.create({
+      data: {
+        nhanVienId,
+        caLamViecId,
+        khachHangId,
+        total: calculatedTotal,
+        status: 'PENDING', // Mặc định là PENDING chờ thanh toán
+        chiTiets: {
+          create: orderItemsToCreate,
+        },
+      },
+      include: {
+        chiTiets: {
+          include: {
+            sanPham: true,
+          },
+        },
+        nhanVien: true,
+        khachHang: true,
+      },
+    });
+
+    return order;
+  });
+};
+
+// Lấy danh sách đơn hàng có bộ lọc, phân trang
+export const findManyOrders = async (query: {
+  status?: string;
+  nhanVienId?: number;
+  khachHangId?: number;
+  caLamViecId?: number;
+  page?: number;
+  limit?: number;
+}) => {
+  const { status, nhanVienId, khachHangId, caLamViecId, page = 1, limit = 20 } = query;
+  const where: any = {};
+
+  if (status) where.status = status;
+  if (nhanVienId) where.nhanVienId = nhanVienId;
+  if (khachHangId) where.khachHangId = khachHangId;
+  if (caLamViecId) where.caLamViecId = caLamViecId;
+
+  const [orders, total] = await Promise.all([
+    prisma.donHang.findMany({
+      where,
+      include: {
+        nhanVien: { select: { fullName: true, username: true } },
+        khachHang: { select: { name: true, phone: true } },
+        _count: { select: { chiTiets: true } },
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.donHang.count({ where }),
+  ]);
+
+  return {
+    data: orders,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
+
+// Lấy chi tiết một đơn hàng theo ID
+export const findOrderById = (id: number) =>
+  prisma.donHang.findUnique({
+    where: { id },
+    include: {
+      nhanVien: { select: { id: true, fullName: true, username: true } },
+      khachHang: true,
+      caLamViec: true,
+      chiTiets: {
+        include: {
+          sanPham: true,
+        },
+      },
+      giaoDichs: {
+        include: {
+          pttt: true,
+        },
+      },
+      hoaDon: true,
+    },
+  });
+
+// Cập nhật trạng thái đơn hàng (PENDING, COMPLETED, CANCELLED)
+export const updateOrderStatus = async (id: number, status: string) => {
+  // Nếu hủy đơn hàng, cần hoàn lại số lượng tồn kho sản phẩm
+  if (status === 'CANCELLED') {
+    return prisma.$transaction(async (tx) => {
+      const order = await tx.donHang.findUnique({
+        where: { id },
+        include: { chiTiets: true },
+      });
+
+      if (!order) throw new Error('Không tìm thấy đơn hàng');
+      if (order.status === 'CANCELLED') throw new Error('Đơn hàng đã được hủy trước đó');
+
+      // Hoàn trả tồn kho cho mỗi sản phẩm
+      for (const item of order.chiTiets) {
+        await tx.sanPham.update({
+          where: { id: item.sanPhamId },
+          data: {
+            stock: {
+              increment: item.quantity,
+            },
+          },
+        });
+      }
+
+      return tx.donHang.update({
+        where: { id },
+        data: { status },
+        include: { chiTiets: true },
+      });
+    });
+  }
+
+  return prisma.donHang.update({
+    where: { id },
+    data: { status },
+    include: { chiTiets: true },
+  });
+};
