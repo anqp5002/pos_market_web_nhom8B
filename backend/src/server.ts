@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
+import authRoutes from './routes/auth.routes';
+import { errorMiddleware } from './middleware/error.middleware';
 
 dotenv.config();
 
@@ -9,7 +11,10 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true,
+}));
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -23,10 +28,18 @@ app.get('/api/health', (_req, res) => {
   });
 });
 
+// API Routes
+app.use('/api/auth', authRoutes);
+
+// Error handler (phải đặt cuối cùng)
+app.use(errorMiddleware);
+
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`📋 Health check: http://localhost:${PORT}/api/health`);
+  console.log(`🔐 Auth API: http://localhost:${PORT}/api/auth/login`);
 });
 
 export default app;
+
