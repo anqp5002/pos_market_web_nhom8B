@@ -1,4 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+// Re-export prisma instance từ config chính
+// db.ts dùng biến môi trường riêng (DB_HOST, DB_PORT, ...)
+import 'dotenv/config';
+import { PrismaClient } from '../generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 
