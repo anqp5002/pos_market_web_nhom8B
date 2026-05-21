@@ -1,0 +1,223 @@
+'use client';
+
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { productSchema, type ProductFormValues } from '@/lib/validators';
+import { apiFetch } from '@/lib/api';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Plus, Pencil } from 'lucide-react';
+
+interface Category {
+  id: number;
+  name: string;
+}
+
+interface Product {
+  id: number;
+  barcode: string;
+  name: string;
+  price: number;
+  stock: number;
+  categoryId: number;
+}
+
+interface ProductFormProps {
+  product?: Product;
+  categories: Category[];
+  onSuccess: () => void;
+}
+
+export default function ProductForm({ product, categories, onSuccess }: ProductFormProps) {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const isEdit = !!product;
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm<ProductFormValues>({
+    resolver: zodResolver(productSchema),
+    defaultValues: product
+      ? {
+          barcode: product.barcode,
+          name: product.name,
+          price: product.price,
+          stock: product.stock,
+          categoryId: product.categoryId,
+        }
+      : {
+          barcode: '',
+          name: '',
+          price: 0,
+          stock: 0,
+          categoryId: 0,
+        },
+  });
+
+  const onSubmit = async (data: ProductFormValues) => {
+    setLoading(true);
+    setError('');
+    try {
+      if (isEdit) {
+        await apiFetch(`/products/${product.id}`, {
+          method: 'PUT',
+          body: JSON.stringify(data),
+        });
+      } else {
+        await apiFetch('/products', {
+          method: 'POST',
+          body: JSON.stringify(data),
+        });
+      }
+      setOpen(false);
+      reset();
+      onSuccess();
+    } catch (err: any) {
+      setError(err.message || 'Có lỗi xảy ra');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setError(''); } }}>
+      <DialogTrigger asChild>
+        {isEdit ? (
+          <Button variant="ghost" size="sm">
+            <Pencil className="w-4 h-4" />
+          </Button>
+        ) : (
+          <Button>
+            <Plus className="w-4 h-4 mr-2" />
+            Thêm Sản Phẩm
+          </Button>
+        )}
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[480px]">
+        <DialogHeader>
+          <DialogTitle>{isEdit ? 'Sửa Sản Phẩm' : 'Thêm Sản Phẩm Mới'}</DialogTitle>
+        </DialogHeader>
+
+        {error && (
+          <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm border border-red-200">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* Barcode */}
+          <div className="space-y-2">
+            <Label htmlFor="barcode">Mã Barcode</Label>
+            <Input
+              id="barcode"
+              placeholder="Nhập mã barcode"
+              disabled={isEdit}
+              {...register('barcode')}
+            />
+            {errors.barcode && (
+              <p className="text-red-500 text-sm">{errors.barcode.message}</p>
+            )}
+          </div>
+
+          {/* Name */}
+          <div className="space-y-2">
+            <Label htmlFor="name">Tên Sản Phẩm</Label>
+            <Input
+              id="name"
+              placeholder="Nhập tên sản phẩm"
+              {...register('name')}
+            />
+            {errors.name && (
+              <p className="text-red-500 text-sm">{errors.name.message}</p>
+            )}
+          </div>
+
+          {/* Price */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="price">Giá (VNĐ)</Label>
+              <Input
+                id="price"
+                type="number"
+                step="1000"
+                placeholder="0"
+                {...register('price', { valueAsNumber: true })}
+              />
+              {errors.price && (
+                <p className="text-red-500 text-sm">{errors.price.message}</p>
+              )}
+            </div>
+
+            {/* Stock */}
+            <div className="space-y-2">
+              <Label htmlFor="stock">Tồn Kho</Label>
+              <Input
+                id="stock"
+                type="number"
+                placeholder="0"
+                {...register('stock', { valueAsNumber: true })}
+              />
+              {errors.stock && (
+                <p className="text-red-500 text-sm">{errors.stock.message}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Category Select */}
+          <div className="space-y-2">
+            <Label>Danh Mục</Label>
+            <Select
+              defaultValue={product ? String(product.categoryId) : undefined}
+              onValueChange={(val) => setValue('categoryId', Number(val), { shouldValidate: true })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Chọn danh mục" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((cat) => (
+                  <SelectItem key={cat.id} value={String(cat.id)}>
+                    {cat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.categoryId && (
+              <p className="text-red-500 text-sm">{errors.categoryId.message}</p>
+            )}
+          </div>
+
+          {/* Submit */}
+          <div className="flex justify-end gap-3 pt-2">
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              Hủy
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? 'Đang lưu...' : isEdit ? 'Cập Nhật' : 'Tạo Mới'}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
