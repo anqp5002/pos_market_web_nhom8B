@@ -6,6 +6,8 @@ import productRoutes from './routes/product.routes';
 import categoryRoutes from './routes/category.routes';
 import orderRoutes from './routes/order.routes';
 import transactionRoutes from './routes/transaction.routes';
+import reportRoutes from './routes/report.routes';
+import aiRoutes from './routes/ai.routes';
 
 dotenv.config();
 
@@ -32,6 +34,9 @@ app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/transactions', transactionRoutes);
+app.use('/api/reports', reportRoutes);
+app.use('/api/ai', aiRoutes);
+
 
 
 
