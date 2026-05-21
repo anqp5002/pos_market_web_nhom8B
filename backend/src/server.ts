@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import productRoutes from './routes/product.routes';
 import categoryRoutes from './routes/category.routes';
+import orderRoutes from './routes/order.routes';
 
 dotenv.config();
 
@@ -28,6 +29,8 @@ app.get('/api/health', (_req, res) => {
 // API Routes
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/orders', orderRoutes);
+
 
 // Start server
 app.listen(PORT, () => {
