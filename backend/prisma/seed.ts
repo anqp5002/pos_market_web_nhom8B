@@ -1,180 +1,192 @@
-import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
+import bcrypt from 'bcryptjs';
+import dotenv from 'dotenv';
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
+dotenv.config();
 
+const pool = new Pool({ connectionString: process.env.DATABASE_URL! });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log('🌱 Seeding database...');
+  console.log('🌱 Bắt đầu seed data...');
 
-  // Tạo Vai Trò
+  // ========== 1. Tạo vai trò ==========
   const adminRole = await prisma.vaiTro.upsert({
-    where: { name: 'ADMIN' },
+    where: { name: 'Admin' },
     update: {},
-    create: { name: 'ADMIN' },
+    create: { name: 'Admin' },
   });
 
   const cashierRole = await prisma.vaiTro.upsert({
-    where: { name: 'CASHIER' },
+    where: { name: 'Cashier' },
     update: {},
-    create: { name: 'CASHIER' },
+    create: { name: 'Cashier' },
   });
 
-  console.log('✅ Roles created:', adminRole.name, cashierRole.name);
+  console.log('✅ Vai trò: Admin, Cashier');
 
-  // Tạo Nhân Viên mặc định (password: 123456)
-  const admin = await prisma.nhanVien.upsert({
+  // ========== 2. Tạo nhân viên mặc định ==========
+  const hashedPassword = await bcrypt.hash('123456', 10);
+
+  await prisma.nhanVien.upsert({
     where: { username: 'admin' },
     update: {},
     create: {
       username: 'admin',
-      password: '123456', // Sẽ hash khi có Auth module
-      fullName: 'Quản Trị Viên',
+      password: hashedPassword,
+      fullName: 'Quản trị viên',
       roleId: adminRole.id,
     },
   });
 
-  const cashier = await prisma.nhanVien.upsert({
+  await prisma.nhanVien.upsert({
     where: { username: 'cashier01' },
     update: {},
     create: {
       username: 'cashier01',
-      password: '123456',
-      fullName: 'Thu Ngân 01',
+      password: hashedPassword,
+      fullName: 'Thu ngân 01',
       roleId: cashierRole.id,
     },
   });
 
-  console.log('✅ Users created:', admin.username, cashier.username);
+  await prisma.nhanVien.upsert({
+    where: { username: 'cashier02' },
+    update: {},
+    create: {
+      username: 'cashier02',
+      password: hashedPassword,
+      fullName: 'Thu ngân 02',
+      roleId: cashierRole.id,
+    },
+  });
 
-  // Tạo 5 Danh Mục
-  const categories = [
-    'Thực phẩm',
-    'Đồ uống',
-    'Đồ gia dụng',
-    'Chăm sóc cá nhân',
-    'Văn phòng phẩm',
-  ];
+  console.log('✅ Nhân viên: admin, cashier01, cashier02 (password: 123456)');
 
-  const createdCategories = [];
-  for (const name of categories) {
-    const cat = await prisma.danhMuc.upsert({
+  // ========== 3. Tạo phương thức thanh toán ==========
+  const paymentMethods = ['CASH', 'CREDIT_CARD', 'QR_CODE'];
+  for (const name of paymentMethods) {
+    await prisma.phuongThucThanhToan.upsert({
       where: { name },
       update: {},
       create: { name },
     });
-    createdCategories.push(cat);
   }
 
-  console.log('✅ Categories created:', createdCategories.length);
+  console.log('✅ Phương thức thanh toán: CASH, CREDIT_CARD, QR_CODE');
 
-  // Tạo 50 Sản Phẩm mẫu
+  // ========== 4. Tạo danh mục sản phẩm ==========
+  const categories = ['Thực phẩm', 'Đồ uống', 'Gia dụng', 'Bánh kẹo', 'Sữa & Bơ'];
+  for (const name of categories) {
+    await prisma.danhMuc.upsert({
+      where: { name },
+      update: {},
+      create: { name },
+    });
+  }
+
+  console.log('✅ Danh mục: 5 danh mục');
+
+  // ========== 5. Tạo sản phẩm mẫu (50 SP) ==========
+  const allCategories = await prisma.danhMuc.findMany();
+  const catMap: Record<string, number> = {};
+  for (const c of allCategories) {
+    catMap[c.name] = c.id;
+  }
+
   const products = [
-    // Thực phẩm (category 0)
-    { barcode: 'TP001', name: 'Mì Hảo Hảo tôm chua cay', price: 4500, stock: 200, catIdx: 0 },
-    { barcode: 'TP002', name: 'Mì Omachi xốt Spaghetti', price: 7000, stock: 150, catIdx: 0 },
-    { barcode: 'TP003', name: 'Cơm cháy chà bông 200g', price: 35000, stock: 80, catIdx: 0 },
-    { barcode: 'TP004', name: 'Bánh mì sandwich Kinh Đô', price: 25000, stock: 60, catIdx: 0 },
-    { barcode: 'TP005', name: 'Xúc xích Vissan 175g', price: 28000, stock: 100, catIdx: 0 },
-    { barcode: 'TP006', name: 'Dầu ăn Simply 1L', price: 42000, stock: 90, catIdx: 0 },
-    { barcode: 'TP007', name: 'Nước mắm Chinsu 500ml', price: 22000, stock: 120, catIdx: 0 },
-    { barcode: 'TP008', name: 'Đường Biên Hòa 1kg', price: 20000, stock: 75, catIdx: 0 },
-    { barcode: 'TP009', name: 'Gạo ST25 5kg', price: 120000, stock: 40, catIdx: 0 },
-    { barcode: 'TP010', name: 'Bột giặt OMO 4.5kg', price: 145000, stock: 35, catIdx: 0 },
-
-    // Đồ uống (category 1)
-    { barcode: 'DU001', name: 'Coca-Cola lon 330ml', price: 10000, stock: 300, catIdx: 1 },
-    { barcode: 'DU002', name: 'Pepsi lon 330ml', price: 10000, stock: 250, catIdx: 1 },
-    { barcode: 'DU003', name: 'Nước suối Aquafina 500ml', price: 5000, stock: 400, catIdx: 1 },
-    { barcode: 'DU004', name: 'Trà xanh 0 độ 500ml', price: 10000, stock: 180, catIdx: 1 },
-    { barcode: 'DU005', name: 'Sữa Vinamilk 220ml', price: 7000, stock: 200, catIdx: 1 },
-    { barcode: 'DU006', name: 'Nước ép cam Teppy 1L', price: 28000, stock: 60, catIdx: 1 },
-    { barcode: 'DU007', name: 'Cà phê G7 hộp 20 gói', price: 52000, stock: 70, catIdx: 1 },
-    { barcode: 'DU008', name: 'Bia Tiger lon 330ml', price: 14000, stock: 150, catIdx: 1 },
-    { barcode: 'DU009', name: 'Red Bull 250ml', price: 10000, stock: 120, catIdx: 1 },
-    { barcode: 'DU010', name: 'Trà sữa Kirin 345ml', price: 15000, stock: 90, catIdx: 1 },
-
-    // Đồ gia dụng (category 2)
-    { barcode: 'GD001', name: 'Nước rửa chén Sunlight 750ml', price: 28000, stock: 85, catIdx: 2 },
-    { barcode: 'GD002', name: 'Nước lau sàn Mỹ Hảo 1L', price: 22000, stock: 60, catIdx: 2 },
-    { barcode: 'GD003', name: 'Khăn giấy Pulppy 6 cuộn', price: 35000, stock: 50, catIdx: 2 },
-    { barcode: 'GD004', name: 'Túi rác đen 1kg', price: 15000, stock: 100, catIdx: 2 },
-    { barcode: 'GD005', name: 'Bóng đèn LED 9W', price: 25000, stock: 45, catIdx: 2 },
-    { barcode: 'GD006', name: 'Pin AA Energizer (4 viên)', price: 45000, stock: 55, catIdx: 2 },
-    { barcode: 'GD007', name: 'Keo dính chuột', price: 12000, stock: 30, catIdx: 2 },
-    { barcode: 'GD008', name: 'Màng bọc thực phẩm 30cm', price: 18000, stock: 40, catIdx: 2 },
-    { barcode: 'GD009', name: 'Găng tay cao su size M', price: 20000, stock: 35, catIdx: 2 },
-    { barcode: 'GD010', name: 'Bọt biển rửa chén (3 miếng)', price: 10000, stock: 70, catIdx: 2 },
-
-    // Chăm sóc cá nhân (category 3)
-    { barcode: 'CN001', name: 'Dầu gội Clear 650ml', price: 95000, stock: 40, catIdx: 3 },
-    { barcode: 'CN002', name: 'Sữa tắm Dove 500ml', price: 85000, stock: 45, catIdx: 3 },
-    { barcode: 'CN003', name: 'Kem đánh răng P/S 180g', price: 32000, stock: 80, catIdx: 3 },
-    { barcode: 'CN004', name: 'Bàn chải Oral-B', price: 25000, stock: 60, catIdx: 3 },
-    { barcode: 'CN005', name: 'Nước súc miệng Listerine 250ml', price: 42000, stock: 35, catIdx: 3 },
-    { barcode: 'CN006', name: 'Băng vệ sinh Diana 8 miếng', price: 22000, stock: 90, catIdx: 3 },
-    { barcode: 'CN007', name: 'Khẩu trang y tế (50 cái)', price: 45000, stock: 100, catIdx: 3 },
-    { barcode: 'CN008', name: 'Nước rửa tay Lifebuoy 500ml', price: 55000, stock: 50, catIdx: 3 },
-    { barcode: 'CN009', name: 'Kem chống nắng Sunplay SPF50', price: 68000, stock: 25, catIdx: 3 },
-    { barcode: 'CN010', name: 'Giấy ướt Bobby 100 tờ', price: 38000, stock: 55, catIdx: 3 },
-
-    // Văn phòng phẩm (category 4)
-    { barcode: 'VP001', name: 'Vở Campus 96 trang', price: 8000, stock: 200, catIdx: 4 },
-    { barcode: 'VP002', name: 'Bút bi Thiên Long TL-027', price: 5000, stock: 300, catIdx: 4 },
-    { barcode: 'VP003', name: 'Bút chì 2B Staedtler', price: 12000, stock: 150, catIdx: 4 },
-    { barcode: 'VP004', name: 'Thước kẻ 30cm', price: 6000, stock: 100, catIdx: 4 },
-    { barcode: 'VP005', name: 'Tẩy Pentel Hi-Polymer', price: 8000, stock: 120, catIdx: 4 },
-    { barcode: 'VP006', name: 'Kéo văn phòng 17cm', price: 15000, stock: 40, catIdx: 4 },
-    { barcode: 'VP007', name: 'Băng keo trong 2.4cm', price: 7000, stock: 80, catIdx: 4 },
-    { barcode: 'VP008', name: 'Giấy A4 Double A 500 tờ', price: 75000, stock: 30, catIdx: 4 },
-    { barcode: 'VP009', name: 'Bút dạ quang Stabilo', price: 18000, stock: 60, catIdx: 4 },
-    { barcode: 'VP010', name: 'Sổ tay bìa cứng A5', price: 25000, stock: 45, catIdx: 4 },
+    // Thực phẩm (10)
+    { barcode: 'SP001', name: 'Mì Hảo Hảo tôm chua cay', price: 4500, stock: 200, categoryId: catMap['Thực phẩm'] },
+    { barcode: 'SP002', name: 'Mì Omachi xốt Spaghetti', price: 8000, stock: 150, categoryId: catMap['Thực phẩm'] },
+    { barcode: 'SP003', name: 'Phở Vifon bò', price: 7500, stock: 120, categoryId: catMap['Thực phẩm'] },
+    { barcode: 'SP004', name: 'Cháo ăn liền Cây Thị', price: 6000, stock: 100, categoryId: catMap['Thực phẩm'] },
+    { barcode: 'SP005', name: 'Xúc xích Vissan 40g', price: 5000, stock: 300, categoryId: catMap['Thực phẩm'] },
+    { barcode: 'SP006', name: 'Cá hộp 3 Cô Gái', price: 15000, stock: 80, categoryId: catMap['Thực phẩm'] },
+    { barcode: 'SP007', name: 'Pate Hạ Long 90g', price: 12000, stock: 90, categoryId: catMap['Thực phẩm'] },
+    { barcode: 'SP008', name: 'Nước mắm Nam Ngư 500ml', price: 25000, stock: 60, categoryId: catMap['Thực phẩm'] },
+    { barcode: 'SP009', name: 'Dầu ăn Tường An 1L', price: 38000, stock: 50, categoryId: catMap['Thực phẩm'] },
+    { barcode: 'SP010', name: 'Gạo ST25 5kg', price: 120000, stock: 30, categoryId: catMap['Thực phẩm'] },
+    // Đồ uống (10)
+    { barcode: 'DU001', name: 'Coca Cola 330ml', price: 10000, stock: 250, categoryId: catMap['Đồ uống'] },
+    { barcode: 'DU002', name: 'Pepsi 330ml', price: 10000, stock: 250, categoryId: catMap['Đồ uống'] },
+    { barcode: 'DU003', name: 'Trà xanh 0 độ 500ml', price: 10000, stock: 200, categoryId: catMap['Đồ uống'] },
+    { barcode: 'DU004', name: 'Nước suối Aquafina 500ml', price: 5000, stock: 400, categoryId: catMap['Đồ uống'] },
+    { barcode: 'DU005', name: 'Red Bull 250ml', price: 10000, stock: 180, categoryId: catMap['Đồ uống'] },
+    { barcode: 'DU006', name: 'Sting dâu 330ml', price: 8000, stock: 200, categoryId: catMap['Đồ uống'] },
+    { barcode: 'DU007', name: 'Nước cam Teppy 327ml', price: 8000, stock: 150, categoryId: catMap['Đồ uống'] },
+    { barcode: 'DU008', name: 'Cà phê G7 3in1 hộp 20 gói', price: 55000, stock: 40, categoryId: catMap['Đồ uống'] },
+    { barcode: 'DU009', name: 'Trà sữa Nestea 16g x 10', price: 35000, stock: 60, categoryId: catMap['Đồ uống'] },
+    { barcode: 'DU010', name: 'Nước yến Thiên Sơn 315ml', price: 15000, stock: 100, categoryId: catMap['Đồ uống'] },
+    // Gia dụng (10)
+    { barcode: 'GD001', name: 'Bàn chải đánh răng P/S', price: 15000, stock: 100, categoryId: catMap['Gia dụng'] },
+    { barcode: 'GD002', name: 'Kem đánh răng Colgate 150g', price: 28000, stock: 80, categoryId: catMap['Gia dụng'] },
+    { barcode: 'GD003', name: 'Nước rửa chén Sunlight 750ml', price: 32000, stock: 70, categoryId: catMap['Gia dụng'] },
+    { barcode: 'GD004', name: 'Bột giặt OMO 3kg', price: 105000, stock: 40, categoryId: catMap['Gia dụng'] },
+    { barcode: 'GD005', name: 'Dầu gội Clear 650ml', price: 115000, stock: 35, categoryId: catMap['Gia dụng'] },
+    { barcode: 'GD006', name: 'Sữa tắm Dove 500g', price: 85000, stock: 50, categoryId: catMap['Gia dụng'] },
+    { barcode: 'GD007', name: 'Giấy vệ sinh Pulppy 12 cuộn', price: 65000, stock: 60, categoryId: catMap['Gia dụng'] },
+    { barcode: 'GD008', name: 'Khăn giấy Kleenex 100 tờ', price: 22000, stock: 120, categoryId: catMap['Gia dụng'] },
+    { barcode: 'GD009', name: 'Nước xả Comfort 3.2L', price: 145000, stock: 25, categoryId: catMap['Gia dụng'] },
+    { barcode: 'GD010', name: 'Nước tẩy Javel 1L', price: 18000, stock: 90, categoryId: catMap['Gia dụng'] },
+    // Bánh kẹo (10)
+    { barcode: 'BK001', name: 'Bánh Oreo 133g', price: 22000, stock: 100, categoryId: catMap['Bánh kẹo'] },
+    { barcode: 'BK002', name: 'Snack Oishi tôm 42g', price: 7000, stock: 200, categoryId: catMap['Bánh kẹo'] },
+    { barcode: 'BK003', name: 'Kẹo dẻo Trolli 100g', price: 25000, stock: 80, categoryId: catMap['Bánh kẹo'] },
+    { barcode: 'BK004', name: 'Socola KitKat 4 thanh', price: 20000, stock: 120, categoryId: catMap['Bánh kẹo'] },
+    { barcode: 'BK005', name: 'Bánh quy Cosy 288g', price: 35000, stock: 60, categoryId: catMap['Bánh kẹo'] },
+    { barcode: 'BK006', name: 'Kẹo Alpenliebe hũ 16 viên', price: 18000, stock: 150, categoryId: catMap['Bánh kẹo'] },
+    { barcode: 'BK007', name: 'Bánh Chocopie 6 cái', price: 28000, stock: 90, categoryId: catMap['Bánh kẹo'] },
+    { barcode: 'BK008', name: 'Snack Lay\'s Classic 95g', price: 18000, stock: 110, categoryId: catMap['Bánh kẹo'] },
+    { barcode: 'BK009', name: 'Kẹo cao su Doublemint 15 viên', price: 12000, stock: 200, categoryId: catMap['Bánh kẹo'] },
+    { barcode: 'BK010', name: 'Bánh tráng me Tây Ninh 200g', price: 30000, stock: 70, categoryId: catMap['Bánh kẹo'] },
+    // Sữa & Bơ (10)
+    { barcode: 'SB001', name: 'Sữa tươi Vinamilk 1L', price: 32000, stock: 80, categoryId: catMap['Sữa & Bơ'] },
+    { barcode: 'SB002', name: 'Sữa TH True Milk 1L', price: 35000, stock: 60, categoryId: catMap['Sữa & Bơ'] },
+    { barcode: 'SB003', name: 'Sữa đặc Ông Thọ 380g', price: 22000, stock: 100, categoryId: catMap['Sữa & Bơ'] },
+    { barcode: 'SB004', name: 'Sữa chua Vinamilk có đường 100g x 4', price: 22000, stock: 120, categoryId: catMap['Sữa & Bơ'] },
+    { barcode: 'SB005', name: 'Phô mai con bò cười 8 miếng', price: 35000, stock: 70, categoryId: catMap['Sữa & Bơ'] },
+    { barcode: 'SB006', name: 'Bơ thực vật Meizan 200g', price: 18000, stock: 50, categoryId: catMap['Sữa & Bơ'] },
+    { barcode: 'SB007', name: 'Sữa đậu nành Fami 200ml x 6', price: 25000, stock: 90, categoryId: catMap['Sữa & Bơ'] },
+    { barcode: 'SB008', name: 'Sữa Ensure Gold 400g', price: 285000, stock: 20, categoryId: catMap['Sữa & Bơ'] },
+    { barcode: 'SB009', name: 'Yakult lốc 5 chai', price: 22000, stock: 100, categoryId: catMap['Sữa & Bơ'] },
+    { barcode: 'SB010', name: 'Sữa bột NAN Optipro 800g', price: 395000, stock: 15, categoryId: catMap['Sữa & Bơ'] },
   ];
 
   for (const p of products) {
     await prisma.sanPham.upsert({
       where: { barcode: p.barcode },
       update: {},
-      create: {
-        barcode: p.barcode,
-        name: p.name,
-        price: p.price,
-        stock: p.stock,
-        categoryId: createdCategories[p.catIdx].id,
-      },
+      create: p,
     });
   }
 
-  console.log('✅ Products created:', products.length);
+  console.log('✅ Sản phẩm: 50 sản phẩm mẫu');
 
-  // Tạo 20 Khách Hàng mẫu
+  // ========== 6. Tạo khách hàng mẫu (20 KH) ==========
   const customers = [
-    { name: 'Nguyễn Văn An', phone: '0901234001', email: 'an@gmail.com' },
-    { name: 'Trần Thị Bích', phone: '0901234002', email: 'bich@gmail.com' },
-    { name: 'Lê Hoàng Cường', phone: '0901234003', email: 'cuong@gmail.com' },
-    { name: 'Phạm Thị Dung', phone: '0901234004', email: 'dung@gmail.com' },
-    { name: 'Hoàng Văn Em', phone: '0901234005', email: null },
-    { name: 'Vũ Thị Phương', phone: '0901234006', email: 'phuong@gmail.com' },
-    { name: 'Đặng Minh Giang', phone: '0901234007', email: null },
-    { name: 'Bùi Thị Hoa', phone: '0901234008', email: 'hoa@gmail.com' },
-    { name: 'Ngô Quang Huy', phone: '0901234009', email: 'huy@gmail.com' },
-    { name: 'Lý Thị Kim', phone: '0901234010', email: null },
-    { name: 'Trương Văn Lâm', phone: '0901234011', email: 'lam@gmail.com' },
-    { name: 'Đinh Thị Mai', phone: '0901234012', email: 'mai@gmail.com' },
-    { name: 'Phan Văn Nam', phone: '0901234013', email: null },
-    { name: 'Dương Thị Oanh', phone: '0901234014', email: 'oanh@gmail.com' },
-    { name: 'Hồ Quốc Phong', phone: '0901234015', email: 'phong@gmail.com' },
-    { name: 'Tạ Thị Quỳnh', phone: '0901234016', email: null },
-    { name: 'Châu Văn Rạng', phone: '0901234017', email: 'rang@gmail.com' },
-    { name: 'Lương Thị Sương', phone: '0901234018', email: 'suong@gmail.com' },
-    { name: 'Mai Văn Tài', phone: '0901234019', email: null },
-    { name: 'Võ Thị Uyên', phone: '0901234020', email: 'uyen@gmail.com' },
+    { name: 'Nguyễn Văn An', phone: '0901000001', email: 'an@email.com' },
+    { name: 'Trần Thị Bình', phone: '0901000002', email: 'binh@email.com' },
+    { name: 'Lê Hoàng Cường', phone: '0901000003', email: 'cuong@email.com' },
+    { name: 'Phạm Thúy Dung', phone: '0901000004', email: 'dung@email.com' },
+    { name: 'Hoàng Minh Em', phone: '0901000005', email: 'em@email.com' },
+    { name: 'Võ Thanh Phong', phone: '0901000006', email: 'phong@email.com' },
+    { name: 'Đặng Bích Giang', phone: '0901000007', email: 'giang@email.com' },
+    { name: 'Bùi Quốc Hùng', phone: '0901000008', email: 'hung@email.com' },
+    { name: 'Ngô Thị Ịnh', phone: '0901000009', email: null },
+    { name: 'Lý Gia Khang', phone: '0901000010', email: 'khang@email.com' },
+    { name: 'Trương Mỹ Linh', phone: '0901000011', email: 'linh@email.com' },
+    { name: 'Đinh Văn Mạnh', phone: '0901000012', email: null },
+    { name: 'Hồ Nhật Nam', phone: '0901000013', email: 'nam@email.com' },
+    { name: 'Châu Thị Oanh', phone: '0901000014', email: 'oanh@email.com' },
+    { name: 'Dương Anh Phúc', phone: '0901000015', email: null },
+    { name: 'Mai Thị Quỳnh', phone: '0901000016', email: 'quynh@email.com' },
+    { name: 'Phan Văn Rạng', phone: '0901000017', email: null },
+    { name: 'Tạ Minh Sơn', phone: '0901000018', email: 'son@email.com' },
+    { name: 'Lưu Đức Toàn', phone: '0901000019', email: 'toan@email.com' },
+    { name: 'Huỳnh Yến Vy', phone: '0901000020', email: 'vy@email.com' },
   ];
 
   for (const c of customers) {
@@ -185,38 +197,20 @@ async function main() {
     });
   }
 
-  console.log('✅ Customers created:', customers.length);
-
-  // Tạo Phương Thức Thanh Toán
-  const paymentMethods = ['CASH', 'CREDIT_CARD', 'QR_CODE'];
-  for (const name of paymentMethods) {
-    await prisma.phuongThucThanhToan.upsert({
-      where: { name },
-      update: {},
-      create: { name },
-    });
-  }
-
-  console.log('✅ Payment methods created');
-
-  // Tạo Ca Làm Việc mở mặc định cho admin
-  await prisma.caLamViec.create({
-    data: {
-      nhanVienId: admin.id,
-      openingBalance: 1000000, // 1,000,000 VND
-      status: 'OPEN',
-    },
-  });
-  console.log('✅ Default open shift created for admin');
-
-  console.log('🎉 Seed completed!');
+  console.log('✅ Khách hàng: 20 khách hàng mẫu');
+  console.log('');
+  console.log('🎉 Seed hoàn tất!');
+  console.log('📌 Tài khoản đăng nhập:');
+  console.log('   admin / 123456 (Quản trị viên)');
+  console.log('   cashier01 / 123456 (Thu ngân 01)');
+  console.log('   cashier02 / 123456 (Thu ngân 02)');
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Seed error:', e);
+    console.error('❌ Seed lỗi:', e);
     process.exit(1);
   })
-  .finally(async () => {
-    await prisma.$disconnect();
+  .finally(() => {
+    prisma.$disconnect();
   });
