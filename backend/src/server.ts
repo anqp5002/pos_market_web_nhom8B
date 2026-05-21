@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
+import productRoutes from './routes/product.routes';
+import categoryRoutes from './routes/category.routes';
 
 dotenv.config();
 
@@ -22,6 +24,10 @@ app.get('/api/health', (_req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+// API Routes
+app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes);
 
 // Start server
 app.listen(PORT, () => {
