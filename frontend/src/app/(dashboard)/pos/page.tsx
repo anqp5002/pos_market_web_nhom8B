@@ -1,27 +1,39 @@
-export default function PosPage() {
+import ProductGrid from "@/components/pos/ProductGrid";
+import CartSidebar from "@/components/cart/CartSidebar";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+
+// Server Component: fetch data từ Backend
+async function getProducts() {
+  try {
+    const res = await fetch(`${API_URL}/products`, {
+      cache: "no-store",
+    });
+    const data = await res.json();
+    return data.data || [];
+  } catch {
+    return [];
+  }
+}
+
+export default async function PosPage() {
+  const products = await getProducts();
+
+  // Trích xuất danh sách category duy nhất
+  const categories = [
+    ...new Set(products.map((p: any) => p.category?.name).filter(Boolean)),
+  ] as string[];
+
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-800">Bán Hàng (POS)</h1>
-        <span className="text-sm text-gray-500">Sprint 2 — Coming soon</span>
+    <div className="flex gap-4 h-[calc(100vh-5rem)]">
+      {/* Cột trái: Sản phẩm (70%) */}
+      <div className="flex-[7] min-w-0">
+        <ProductGrid products={products} categories={categories} />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Product Grid Area */}
-        <div className="md:col-span-2 bg-white rounded-lg border border-gray-200 p-6 min-h-[500px] flex items-center justify-center">
-          <div className="text-center text-gray-400">
-            <div className="text-6xl mb-4">🛒</div>
-            <p className="text-lg font-medium">Khu vực sản phẩm</p>
-            <p className="text-sm">Sẽ hiển thị grid sản phẩm ở Sprint 2</p>
-          </div>
-        </div>
-        {/* Cart Area */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 min-h-[500px] flex items-center justify-center">
-          <div className="text-center text-gray-400">
-            <div className="text-6xl mb-4">📋</div>
-            <p className="text-lg font-medium">Giỏ hàng</p>
-            <p className="text-sm">Sẽ hiển thị cart ở Sprint 2</p>
-          </div>
-        </div>
+
+      {/* Cột phải: Giỏ hàng (30%) */}
+      <div className="flex-[3] min-w-[320px] max-w-[400px]">
+        <CartSidebar />
       </div>
     </div>
   );
