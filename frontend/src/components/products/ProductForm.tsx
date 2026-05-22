@@ -102,16 +102,22 @@ export default function ProductForm({ product, categories, onSuccess }: ProductF
 
   return (
     <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setError(''); } }}>
-      <DialogTrigger asChild>
+      <DialogTrigger
+        render={
+          isEdit ? (
+            <Button variant="ghost" size="sm" />
+          ) : (
+            <Button />
+          )
+        }
+      >
         {isEdit ? (
-          <Button variant="ghost" size="sm">
-            <Pencil className="w-4 h-4" />
-          </Button>
+          <Pencil className="w-4 h-4" />
         ) : (
-          <Button>
+          <>
             <Plus className="w-4 h-4 mr-2" />
             Thêm Sản Phẩm
-          </Button>
+          </>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[480px]">
