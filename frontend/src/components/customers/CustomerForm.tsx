@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { customerSchema, type CustomerFormData } from '@/lib/validators';
 import { apiFetch } from '@/lib/api';
 import {
   Dialog,
@@ -16,26 +16,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Pencil, Plus } from 'lucide-react';
-
-// Zod validation schema
-const customerSchema = z.object({
-  name: z
-    .string()
-    .min(1, 'Tên khách hàng không được để trống')
-    .max(100, 'Tên không quá 100 ký tự'),
-  phone: z
-    .string()
-    .regex(/^(0[3|5|7|8|9])+([0-9]{8})\b/, 'Số điện thoại không hợp lệ (VD: 0901234567)')
-    .optional()
-    .or(z.literal('')),
-  email: z
-    .string()
-    .email('Email không hợp lệ')
-    .optional()
-    .or(z.literal('')),
-});
-
-type CustomerFormData = z.infer<typeof customerSchema>;
 
 interface Customer {
   id: number;

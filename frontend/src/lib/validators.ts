@@ -22,3 +22,24 @@ export const productSchema = z.object({
 });
 
 export type ProductFormValues = z.infer<typeof productSchema>;
+
+// Customer validation schema — dùng chung cho CustomerForm.tsx
+export const customerSchema = z.object({
+  name: z
+    .string()
+    .min(1, 'Tên khách hàng không được để trống')
+    .max(100, 'Tên không quá 100 ký tự'),
+  phone: z
+    .string()
+    .regex(/^(0[3|5|7|8|9])+([0-9]{8})\b/, 'Số điện thoại không hợp lệ (VD: 0901234567)')
+    .optional()
+    .or(z.literal('')),
+  email: z
+    .string()
+    .email('Email không hợp lệ')
+    .optional()
+    .or(z.literal('')),
+});
+
+export type CustomerFormData = z.infer<typeof customerSchema>;
+

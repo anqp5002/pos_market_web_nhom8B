@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import * as customerService from '../services/customer.service';
+import { createCustomerSchema, updateCustomerSchema } from '../validators/customer.validator';
+import { ZodError } from 'zod';
 
 // GET /api/customers
 export const getAll = async (req: Request, res: Response) => {
@@ -47,21 +49,22 @@ export const getByPhone = async (req: Request, res: Response) => {
   }
 };
 
-// POST /api/customers
+// POST /api/customers — Validate bằng Zod schema
 export const create = async (req: Request, res: Response) => {
   try {
-    const { name, phone, email } = req.body;
-    if (!name || name.trim() === '') {
-      res.status(400).json({ error: 'Tên khách hàng là bắt buộc' });
-      return;
-    }
+    const parsed = createCustomerSchema.parse(req.body);
     const customer = await customerService.create({
-      name: name.trim(),
-      phone: phone?.trim() || undefined,
-      email: email?.trim() || undefined,
+      name: parsed.name,
+      phone: parsed.phone,
+      email: parsed.email,
     });
     res.status(201).json(customer);
   } catch (err: any) {
+    if (err instanceof ZodError) {
+      const messages = err.errors.map((e) => e.message).join(', ');
+      res.status(400).json({ error: messages });
+      return;
+    }
     console.error('Error create customer:', err);
     if (err.code === 'P2002') {
       res.status(400).json({ error: 'Số điện thoại đã được đăng ký' });
@@ -71,18 +74,23 @@ export const create = async (req: Request, res: Response) => {
   }
 };
 
-// PUT /api/customers/:id
+// PUT /api/customers/:id — Validate bằng Zod schema
 export const update = async (req: Request, res: Response) => {
   try {
-    const { name, phone, email } = req.body;
+    const parsed = updateCustomerSchema.parse(req.body);
     const data: any = {};
-    if (name !== undefined) data.name = name.trim();
-    if (phone !== undefined) data.phone = phone?.trim() || null;
-    if (email !== undefined) data.email = email?.trim() || null;
+    if (parsed.name !== undefined) data.name = parsed.name;
+    if (parsed.phone !== undefined) data.phone = parsed.phone;
+    if (parsed.email !== undefined) data.email = parsed.email;
 
     const customer = await customerService.update(Number(req.params.id), data);
     res.json(customer);
   } catch (err: any) {
+    if (err instanceof ZodError) {
+      const messages = err.errors.map((e) => e.message).join(', ');
+      res.status(400).json({ error: messages });
+      return;
+    }
     console.error('Error update customer:', err);
     if (err.code === 'P2025') {
       res.status(404).json({ error: 'Không tìm thấy khách hàng' });
