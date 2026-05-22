@@ -38,7 +38,7 @@ export const createOrder = async (data: CreateOrderInput) => {
     }
 
     // 4. Kiểm tra danh sách sản phẩm và lượng tồn kho
-    const productIds = items.map((i) => i.sanPhamId);
+    const productIds = items.map((i: any) => i.sanPhamId);
     const dbProducts = await tx.sanPham.findMany({
       where: { id: { in: productIds } },
     });
