@@ -36,8 +36,17 @@ export async function apiFetch<T>(
   });
 
   if (!res.ok) {
-    const error = await res.json().catch(() => ({ error: 'Lỗi không xác định' }));
-    throw new Error(error.error || `HTTP Error ${res.status}`);
+    let errorMessage = `HTTP Error ${res.status}`;
+    try {
+      const errorData = await res.json();
+      errorMessage = errorData.error || errorData.message || errorMessage;
+    } catch {
+      try {
+        const text = await res.text();
+        errorMessage = `HTTP ${res.status}: ${text.slice(0, 150)}`;
+      } catch {}
+    }
+    throw new Error(errorMessage);
   }
 
   return res.json();
