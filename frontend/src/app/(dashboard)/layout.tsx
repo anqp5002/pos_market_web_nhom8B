@@ -36,11 +36,11 @@ export default async function DashboardLayout({
             <ShoppingCart className="w-5 h-5" />
             <span className="font-medium">Bán Hàng</span>
           </Link>
-          <Link href="#" className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
+          <Link href="/orders" className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
             <FileText className="w-5 h-5" />
             <span>Đơn Hàng</span>
           </Link>
-          <Link href="#" className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
+          <Link href="/products" className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
             <Package className="w-5 h-5" />
             <span>Sản Phẩm</span>
           </Link>
