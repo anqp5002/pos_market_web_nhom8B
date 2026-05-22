@@ -4,6 +4,8 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes';
 import productRoutes from './routes/product.routes';
+import categoryRoutes from './routes/category.routes';
+import orderRoutes from './routes/order.routes';
 import { errorMiddleware } from './middleware/error.middleware';
 
 dotenv.config();
@@ -32,9 +34,12 @@ app.get('/api/health', (_req, res) => {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/orders', orderRoutes);
 
 // Error handler (phải đặt cuối cùng)
 app.use(errorMiddleware);
+
 
 // Start server
 app.listen(PORT, () => {

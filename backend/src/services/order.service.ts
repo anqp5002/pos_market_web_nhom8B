@@ -50,7 +50,7 @@ export const createOrder = async (data: CreateOrderInput) => {
     let calculatedTotal = 0;
 
     // Tạo cấu trúc lưu thông tin chi tiết các mặt hàng để insert
-    const orderItemsToCreate = [];
+    const orderItemsToCreate: any[] = [];
 
     for (const item of items) {
       const product = dbProducts.find((p) => p.id === item.sanPhamId)!;
