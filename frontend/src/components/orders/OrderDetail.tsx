@@ -28,6 +28,15 @@ import {
   FileText,
   UserCheck
 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import BillPreview from '@/components/invoice/BillPreview';
+
 
 interface SanPham {
   id: number;
@@ -101,6 +110,7 @@ export default function OrderDetail({ order: initialOrder }: OrderDetailProps) {
   const router = useRouter();
   const [order, setOrder] = useState<Order>(initialOrder);
   const [cancelling, setCancelling] = useState(false);
+  const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
 
   // Định dạng tiền tệ
   const formatPrice = (amount: number) => {
@@ -141,11 +151,6 @@ export default function OrderDetail({ order: initialOrder }: OrderDetailProps) {
     }
   };
 
-  // In hóa đơn (sử dụng in trình duyệt cơ bản)
-  const handlePrint = () => {
-    window.print();
-  };
-
   // Trạng thái badge
   const renderStatusBadge = (status: Order['status']) => {
     switch (status) {
@@ -174,33 +179,56 @@ export default function OrderDetail({ order: initialOrder }: OrderDetailProps) {
 
   return (
     <div className="space-y-6 print:p-0 print:space-y-4">
-      {/* Action buttons (hidden when printing) */}
-      <div className="flex justify-end gap-3 print:hidden">
-        <Button
-          variant="outline"
-          onClick={handlePrint}
-          className="flex items-center gap-2"
-        >
-          <Printer className="w-4 h-4" />
-          <span>In hóa đơn</span>
-        </Button>
-        
-        {order.status !== 'CANCELLED' && (
-          <Button
-            variant="destructive"
-            disabled={cancelling}
-            onClick={handleCancelOrder}
-            className="flex items-center gap-2"
-          >
-            {cancelling ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <XCircle className="w-4 h-4" />
-            )}
-            <span>Hủy đơn hàng</span>
-          </Button>
-        )}
+      {/* Bản in hóa đơn ẩn trong chế độ xem thông thường, chỉ hiển thị khi thực hiện In */}
+      <div className="hidden print:block font-sans">
+        <BillPreview order={order as any} />
       </div>
+
+      {/* Nội dung chi tiết đơn hàng thông thường (ẩn khi in) */}
+      <div className="print:hidden space-y-6">
+        {/* Action buttons */}
+        <div className="flex justify-end gap-3">
+          <Dialog open={isInvoiceOpen} onOpenChange={setIsInvoiceOpen}>
+            <DialogTrigger
+              render={
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-2 border-slate-200 hover:bg-slate-100"
+                />
+              }
+            >
+              <Printer className="w-4 h-4" />
+              <span>Xem & In Hóa Đơn</span>
+            </DialogTrigger>
+
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-lg font-bold text-gray-900 border-b pb-2">
+                  Bản Xem Trước Hóa Đơn
+                </DialogTitle>
+              </DialogHeader>
+              <div className="pt-4">
+                <BillPreview order={order as any} />
+              </div>
+            </DialogContent>
+          </Dialog>
+          
+          {order.status !== 'CANCELLED' && (
+            <Button
+              variant="destructive"
+              disabled={cancelling}
+              onClick={handleCancelOrder}
+              className="flex items-center gap-2"
+            >
+              {cancelling ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <XCircle className="w-4 h-4" />
+              )}
+              <span>Hủy đơn hàng</span>
+            </Button>
+          )}
+        </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start print:grid-cols-1 print:gap-4">
         {/* Left column: Product items table */}
@@ -420,5 +448,8 @@ export default function OrderDetail({ order: initialOrder }: OrderDetailProps) {
         </div>
       </div>
     </div>
+    </div>
   );
 }
+
+

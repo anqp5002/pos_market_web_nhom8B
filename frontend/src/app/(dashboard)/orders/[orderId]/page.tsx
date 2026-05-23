@@ -40,7 +40,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 print:hidden">
         <Link href="/orders">
           <Button variant="outline" size="icon" className="h-9 w-9">
             <ArrowLeft className="w-4 h-4" />
@@ -51,6 +51,7 @@ export default async function OrderDetailPage({ params }: PageProps) {
           <p className="text-gray-500 mt-1">Thông tin chi tiết về sản phẩm, giao dịch thanh toán và hóa đơn</p>
         </div>
       </div>
+
 
       <OrderDetail order={order} />
     </div>

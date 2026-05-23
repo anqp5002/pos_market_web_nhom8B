@@ -21,9 +21,9 @@ export default async function DashboardLayout({
   const userInitials = userName.charAt(0).toUpperCase();
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 print:bg-white print:h-auto">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r flex flex-col">
+      <aside className="w-64 bg-white border-r flex flex-col print:hidden">
         <div className="p-6">
           <h1 className="text-2xl font-bold text-gray-800">POS System</h1>
         </div>
@@ -63,8 +63,8 @@ export default async function DashboardLayout({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-16 bg-white border-b flex items-center justify-between px-6">
+      <main className="flex-1 flex flex-col overflow-hidden print:overflow-visible print:h-auto">
+        <header className="h-16 bg-white border-b flex items-center justify-between px-6 print:hidden">
           <h2 className="text-xl font-semibold text-gray-800">Workspace</h2>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3">
@@ -88,10 +88,11 @@ export default async function DashboardLayout({
             </form>
           </div>
         </header>
-        <div className="flex-1 overflow-auto p-6">
+        <div className="flex-1 overflow-auto p-6 print:p-0 print:overflow-visible">
           {children}
         </div>
       </main>
     </div>
+
   );
 }
