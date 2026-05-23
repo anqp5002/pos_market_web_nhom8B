@@ -6,7 +6,9 @@ import authRoutes from './routes/auth.routes';
 import productRoutes from './routes/product.routes';
 import categoryRoutes from './routes/category.routes';
 import orderRoutes from './routes/order.routes';
+import customerRoutes from './routes/customer.routes';
 import { errorMiddleware } from './middleware/error.middleware';
+
 
 dotenv.config();
 
@@ -36,6 +38,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/customers', customerRoutes);
+
 
 // Error handler (phải đặt cuối cùng)
 app.use(errorMiddleware);
