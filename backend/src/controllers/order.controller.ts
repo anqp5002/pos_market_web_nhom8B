@@ -1,5 +1,9 @@
 import { Request, Response } from 'express';
 import * as orderService from '../services/order.service';
+import { generateInvoicePdf } from '../utils/pdf';
+import { sendInvoiceEmail } from '../utils/email';
+import prisma from '../config/prisma';
+
 
 // POST /api/orders
 export const create = async (req: Request, res: Response) => {
@@ -72,3 +76,82 @@ export const pay = async (req: Request, res: Response) => {
     res.status(400).json({ error: err.message || 'Lỗi xử lý thanh toán' });
   }
 };
+
+// GET /api/orders/:id/pdf
+export const getPdf = async (req: Request, res: Response) => {
+  try {
+    const order = await orderService.findOrderById(Number(req.params.id));
+    if (!order) {
+      res.status(404).json({ error: 'Không tìm thấy đơn hàng' });
+      return;
+    }
+    const pdfBuffer = await generateInvoicePdf(order);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=invoice-${order.id}.pdf`);
+    res.send(pdfBuffer);
+  } catch (err: any) {
+    console.error('Error generating PDF:', err);
+    res.status(500).json({ error: 'Lỗi xuất hóa đơn PDF' });
+  }
+};
+
+// POST /api/orders/:id/email
+export const sendEmail = async (req: Request, res: Response) => {
+  try {
+    const order = await orderService.findOrderById(Number(req.params.id));
+    if (!order) {
+      res.status(404).json({ error: 'Không tìm thấy đơn hàng' });
+      return;
+    }
+
+    const toEmail = req.body.email || order.khachHang?.email;
+    if (!toEmail) {
+      res.status(400).json({ error: 'Không tìm thấy địa chỉ email nhận. Vui lòng nhập địa chỉ email.' });
+      return;
+    }
+
+    const pdfBuffer = await generateInvoicePdf(order);
+    const emailResult = await sendInvoiceEmail(toEmail, order, pdfBuffer);
+    
+    res.json({ 
+      message: 'Đã gửi email hóa đơn thành công', 
+      previewUrl: emailResult.previewUrl 
+    });
+  } catch (err: any) {
+    console.error('Error sending email:', err);
+    res.status(500).json({ error: err.message || 'Lỗi gửi email hóa đơn' });
+  }
+};
+
+// GET /api/orders/active-shift
+export const getActiveShift = async (req: Request, res: Response) => {
+  try {
+    let shift = await prisma.caLamViec.findFirst({
+      where: { status: 'OPEN' },
+    });
+
+    if (!shift) {
+      // Tìm cashier đầu tiên hoặc mặc định ID 2
+      const employee = await prisma.nhanVien.findFirst({
+        where: { role: { name: 'Cashier' } },
+      });
+      const employeeId = employee ? employee.id : 2;
+
+      shift = await prisma.caLamViec.create({
+        data: {
+          nhanVienId: employeeId,
+          openingBalance: 1000000,
+          status: 'OPEN',
+        },
+      });
+      console.log(`[Auto] Đã tự động mở ca làm việc ID ${shift.id} cho nhân viên ID ${employeeId}`);
+    }
+
+    res.json(shift);
+  } catch (err: any) {
+    console.error('Error fetching/creating active shift:', err);
+    res.status(500).json({ error: 'Lỗi lấy ca làm việc hoạt động' });
+  }
+};
+
+
