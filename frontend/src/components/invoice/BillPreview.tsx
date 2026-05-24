@@ -57,7 +57,14 @@ interface BillPreviewProps {
   order: Order;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+const getApiUrl = () => {
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    return `http://${host}:4000/api`;
+  }
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+};
+const API_URL = getApiUrl();
 
 // Hàm suy luận đơn vị tính (UOM)
 function getUOM(productName: string, categoryName?: string): string {
