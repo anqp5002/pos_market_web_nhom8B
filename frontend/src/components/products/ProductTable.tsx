@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, getClientToken } from '@/lib/api';
 import {
   Table,
   TableBody,
@@ -66,8 +66,11 @@ export default function ProductTable({
   const fetchProducts = async (page = 1, searchTerm = search, catId = categoryFilter) => {
     setLoading(true);
     try {
+      const token = await getClientToken();
+      const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
       const result = await apiFetch<{ data: Product[]; pagination: Pagination }>('/products', {
         cache: 'no-store',
+        headers,
         params: {
           page,
           limit: 10,
@@ -88,7 +91,9 @@ export default function ProductTable({
   const handleDelete = async (id: number, name: string) => {
     if (!confirm(`Xác nhận xóa sản phẩm "${name}"?`)) return;
     try {
-      await apiFetch(`/products/${id}`, { method: 'DELETE' });
+      const token = await getClientToken();
+      const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+      await apiFetch(`/products/${id}`, { method: 'DELETE', headers });
       fetchProducts(pagination.page);
     } catch (err: any) {
       alert(err.message || 'Không thể xóa sản phẩm');
@@ -127,7 +132,11 @@ export default function ProductTable({
           </div>
           <Select value={categoryFilter} onValueChange={handleCategoryChange}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Tất cả danh mục" />
+              <SelectValue placeholder="Tất cả danh mục">
+                {categoryFilter === 'all'
+                  ? 'Tất cả danh mục'
+                  : categories.find((c) => String(c.id) === categoryFilter)?.name || 'Tất cả danh mục'}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tất cả danh mục</SelectItem>

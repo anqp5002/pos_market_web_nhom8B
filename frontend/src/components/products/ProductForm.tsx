@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { productSchema, type ProductFormValues } from '@/lib/validators';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, getClientToken } from '@/lib/api';
 import {
   Dialog,
   DialogContent,
@@ -54,6 +54,7 @@ export default function ProductForm({ product, categories, onSuccess }: ProductF
     register,
     handleSubmit,
     setValue,
+    control,
     reset,
     formState: { errors },
   } = useForm<ProductFormValues>({
@@ -79,14 +80,19 @@ export default function ProductForm({ product, categories, onSuccess }: ProductF
     setLoading(true);
     setError('');
     try {
+      const token = await getClientToken();
+      const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+
       if (isEdit) {
         await apiFetch(`/products/${product.id}`, {
           method: 'PUT',
+          headers,
           body: JSON.stringify(data),
         });
       } else {
         await apiFetch('/products', {
           method: 'POST',
+          headers,
           body: JSON.stringify(data),
         });
       }
@@ -132,7 +138,6 @@ export default function ProductForm({ product, categories, onSuccess }: ProductF
             <Input
               id="barcode"
               placeholder="Nhập mã barcode"
-              disabled={isEdit}
               {...register('barcode')}
             />
             {errors.barcode && (
@@ -187,21 +192,29 @@ export default function ProductForm({ product, categories, onSuccess }: ProductF
           {/* Category Select */}
           <div className="space-y-2">
             <Label>Danh Mục</Label>
-            <Select
-              defaultValue={product ? String(product.categoryId) : undefined}
-              onValueChange={(val) => setValue('categoryId', Number(val), { shouldValidate: true })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Chọn danh mục" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={String(cat.id)}>
-                    {cat.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Controller
+              name="categoryId"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  value={field.value ? String(field.value) : undefined}
+                  onValueChange={(val) => field.onChange(Number(val))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Chọn danh mục">
+                      {field.value ? categories.find(c => c.id === field.value)?.name : 'Chọn danh mục'}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat.id} value={String(cat.id)}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
             {errors.categoryId && (
               <p className="text-red-500 text-sm">{errors.categoryId.message}</p>
             )}

@@ -73,8 +73,9 @@ export const create = async (req: Request, res: Response) => {
 // PUT /api/products/:id
 export const update = async (req: Request, res: Response) => {
   try {
-    const { name, price, stock, categoryId } = req.body;
+    const { barcode, name, price, stock, categoryId } = req.body;
     const data: any = {};
+    if (barcode !== undefined) data.barcode = barcode;
     if (name !== undefined) data.name = name;
     if (price !== undefined) data.price = Number(price);
     if (stock !== undefined) data.stock = Number(stock);
@@ -86,6 +87,10 @@ export const update = async (req: Request, res: Response) => {
     console.error('Error update product:', err);
     if (err.code === 'P2025') {
       res.status(404).json({ error: 'Không tìm thấy sản phẩm' });
+      return;
+    }
+    if (err.code === 'P2002') {
+      res.status(400).json({ error: 'Barcode đã tồn tại' });
       return;
     }
     res.status(400).json({ error: 'Lỗi cập nhật sản phẩm' });

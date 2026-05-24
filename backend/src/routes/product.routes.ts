@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import * as productCtrl from '../controllers/product.controller';
-import { roleMiddleware } from '../middleware/auth.middleware';
+import { requireAdmin } from '../middleware/role.middleware';
 
 const router = Router();
 
@@ -9,8 +9,8 @@ router.get('/', productCtrl.getAll);
 router.get('/:id', productCtrl.getById);
 
 // === Chỉ Admin mới được tạo/sửa/xóa ===
-router.post('/', roleMiddleware('Admin'), productCtrl.create);
-router.put('/:id', roleMiddleware('Admin'), productCtrl.update);
-router.delete('/:id', roleMiddleware('Admin'), productCtrl.remove);
+router.post('/', requireAdmin, productCtrl.create);
+router.put('/:id', requireAdmin, productCtrl.update);
+router.delete('/:id', requireAdmin, productCtrl.remove);
 
 export default router;

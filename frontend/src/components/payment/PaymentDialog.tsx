@@ -105,6 +105,12 @@ export default function PaymentDialog({
         orderId,
         change: (amountReceived || totalPrice) - totalPrice,
         invoiceNumber: payData.data?.invoice?.invoiceNumber || `INV-${orderId}`,
+        items: [...items],
+        subtotal: getSubtotal(),
+        discount: getDiscountAmount(),
+        vat: getVatAmount(),
+        total: totalPrice,
+        amountReceived: amountReceived || totalPrice,
       });
 
       // Xóa giỏ hàng

@@ -1,10 +1,10 @@
-import { apiFetch } from '@/lib/api';
+import { authFetch } from '@/lib/api';
 import ProductTable from '@/components/products/ProductTable';
 
 // SSR: fetch data trên server
 async function getProducts() {
   try {
-    return await apiFetch<{
+    return await authFetch<{
       data: any[];
       pagination: { page: number; limit: number; total: number; totalPages: number };
     }>('/products', {
@@ -18,7 +18,7 @@ async function getProducts() {
 
 async function getCategories() {
   try {
-    return await apiFetch<any[]>('/categories', { cache: 'no-store' });
+    return await authFetch<any[]>('/categories', { cache: 'no-store' });
   } catch {
     return [];
   }

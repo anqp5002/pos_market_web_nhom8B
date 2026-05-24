@@ -7,7 +7,6 @@ import productRoutes from './routes/product.routes';
 import categoryRoutes from './routes/category.routes';
 import orderRoutes from './routes/order.routes';
 import transactionRoutes from './routes/transaction.routes';
-import customerRoutes from './routes/customer.routes';
 import employeeRoutes from './routes/employee.routes';
 import paymentRoutes from './routes/payment.routes';
 import { authMiddleware } from './middleware/auth.middleware';
@@ -44,7 +43,6 @@ app.use('/api/products', authMiddleware, productRoutes);
 app.use('/api/categories', authMiddleware, categoryRoutes);
 app.use('/api/orders', authMiddleware, orderRoutes);
 app.use('/api/transactions', authMiddleware, transactionRoutes);
-app.use('/api/customers', authMiddleware, customerRoutes);
 app.use('/api/employees', authMiddleware, employeeRoutes);
 app.use('/api/payments', authMiddleware, paymentRoutes);
 
@@ -62,4 +60,3 @@ app.listen(PORT, () => {
 });
 
 export default app;
-

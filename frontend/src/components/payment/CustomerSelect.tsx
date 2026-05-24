@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { User, Search } from "lucide-react";
+import { apiFetch, getClientToken } from "@/lib/api";
 
 interface Customer {
   id: number;
@@ -24,8 +25,11 @@ export default function CustomerSelect({ value, onChange }: CustomerSelectProps)
 
   // Fetch danh sách khách hàng từ API
   useEffect(() => {
-    fetch(`${API_URL}/customers`)
-      .then((res) => res.json())
+    getClientToken()
+      .then((token) => {
+        const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+        return apiFetch<{ data: Customer[] }>("/customers", { headers });
+      })
       .then((data) => setCustomers(data.data || []))
       .catch(() => setCustomers([]));
   }, []);

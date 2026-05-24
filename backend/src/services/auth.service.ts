@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt, { SignOptions } from 'jsonwebtoken';
-import prisma from '../config/db';
+import prisma from '../config/prisma';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'pos-market-secret-key-change-in-production';
 const JWT_EXPIRES_IN = (process.env.JWT_EXPIRES_IN || '8h') as string & SignOptions['expiresIn'];

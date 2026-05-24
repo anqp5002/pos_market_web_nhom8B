@@ -31,16 +31,24 @@ export async function apiFetch<T>(
     }
   }
 
+  const { headers, ...restOptions } = fetchOptions;
+
   const res = await fetch(url, {
+    ...restOptions,
     headers: {
       'Content-Type': 'application/json',
-      ...fetchOptions.headers,
+      ...headers,
     },
-    ...fetchOptions,
   });
+
+  // Ghi log request payload để debug
+  if (url.includes('/products') && ['POST', 'PUT'].includes(fetchOptions.method || '')) {
+    console.log(`[DEBUG API] ${fetchOptions.method} ${url}`, fetchOptions.body);
+  }
 
   if (!res.ok) {
     const error = await res.json().catch(() => ({ error: 'Lỗi không xác định' }));
+    console.error(`[DEBUG API ERROR]`, error);
     throw new Error(error.message || error.error || `HTTP Error ${res.status}`);
   }
 
