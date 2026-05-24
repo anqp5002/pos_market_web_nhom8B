@@ -5,7 +5,7 @@ import { createInvoice } from './invoice.service';
 
 // Tạo đơn hàng mới với Prisma transaction (đảm bảo tính toàn vẹn dữ liệu)
 export const createOrder = async (data: CreateOrderInput) => {
-  const { nhanVienId, caLamViecId, khachHangId, items } = data;
+  const { nhanVienId, caLamViecId, khachHangId, items, discount = 0, taxRate = 0 } = data;
 
   return prisma.$transaction(async (tx) => {
     // 1. Kiểm tra nhân viên tồn tại
@@ -47,7 +47,7 @@ export const createOrder = async (data: CreateOrderInput) => {
       throw new Error('Một số sản phẩm trong đơn hàng không tồn tại');
     }
 
-    let calculatedTotal = 0;
+    let subTotal = 0;
 
     // Tạo cấu trúc lưu thông tin chi tiết các mặt hàng để insert
     const orderItemsToCreate = [];
@@ -74,7 +74,7 @@ export const createOrder = async (data: CreateOrderInput) => {
 
       // Tính tổng tiền cho sản phẩm này
       const itemPrice = product.price;
-      calculatedTotal += itemPrice * item.quantity;
+      subTotal += itemPrice * item.quantity;
 
       orderItemsToCreate.push({
         sanPhamId: item.sanPhamId,
@@ -83,13 +83,18 @@ export const createOrder = async (data: CreateOrderInput) => {
       });
     }
 
-    // 5. Tạo đơn hàng mới
+    // 5. Tính toán chiết khấu và thuế VAT (Tối ưu tính toán DB)
+    const afterDiscount = Math.max(0, subTotal - discount);
+    const taxAmount = afterDiscount * taxRate;
+    const finalTotal = afterDiscount + taxAmount;
+
+    // 6. Tạo đơn hàng mới
     const order = await tx.donHang.create({
       data: {
         nhanVienId,
         caLamViecId,
         khachHangId,
-        total: calculatedTotal,
+        total: finalTotal,
         status: 'PENDING', // Mặc định là PENDING chờ thanh toán
         chiTiets: {
           create: orderItemsToCreate,
