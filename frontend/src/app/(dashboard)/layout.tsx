@@ -12,6 +12,7 @@ import {
   LogOut
 } from "lucide-react";
 import { auth, signOut } from "@/lib/auth";
+import StockAlert from "@/components/layout/StockAlert";
 
 export default async function DashboardLayout({
   children,
@@ -59,7 +60,7 @@ export default async function DashboardLayout({
               <span>Nhân Viên</span>
             </Link>
           )}
-          <Link href="#" className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
+          <Link href="/shift" className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
             <Clock className="w-5 h-5" />
             <span>Ca Làm Việc</span>
           </Link>
@@ -102,6 +103,7 @@ export default async function DashboardLayout({
         <div className="flex-1 overflow-auto p-6">
           {children}
         </div>
+        <StockAlert />
       </main>
     </div>
   );
