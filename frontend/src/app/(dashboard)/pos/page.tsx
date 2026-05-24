@@ -1,7 +1,7 @@
 import ProductGrid from "@/components/pos/ProductGrid";
 import CartSidebar from "@/components/cart/CartSidebar";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+const API_URL = "http://localhost:4000/api";
 
 // Server Component: fetch data từ Backend
 async function getProducts() {

@@ -1,4 +1,12 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+const getApiBase = () => {
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    return `http://${host}:4000/api`;
+  }
+  // Server-side: Always use localhost for absolute reliability on the host machine
+  return 'http://localhost:4000/api';
+};
+const API_BASE = getApiBase();
 
 interface FetchOptions extends RequestInit {
   params?: Record<string, string | number | undefined>;
