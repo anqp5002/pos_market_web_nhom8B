@@ -15,6 +15,17 @@ export const createOrderSchema = z.object({
     .positive('ID khách hàng phải > 0')
     .optional()
     .nullable(),
+  discount: z
+    .number()
+    .min(0, 'Chiết khấu không được âm')
+    .optional()
+    .default(0),
+  taxRate: z
+    .number()
+    .min(0, 'Thuế VAT không được âm')
+    .max(1, 'Thuế VAT không được vượt quá 100% (1.0)')
+    .optional()
+    .default(0),
   items: z
     .array(
       z.object({

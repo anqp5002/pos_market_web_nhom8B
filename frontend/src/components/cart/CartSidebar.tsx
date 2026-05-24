@@ -1,9 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { useCartStore } from "@/stores/cartStore";
 import { Minus, Plus, Trash2, ShoppingBag, X } from "lucide-react";
+import PaymentDialog from "@/components/payment/PaymentDialog";
 
 export default function CartSidebar() {
+  const [paymentOpen, setPaymentOpen] = useState(false);
   const items = useCartStore((s) => s.items);
   const removeItem = useCartStore((s) => s.removeItem);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
@@ -130,14 +133,18 @@ export default function CartSidebar() {
             <span className="text-blue-600">{formatVND(getTotalPrice())}</span>
           </div>
 
-          {/* Button Thanh Toán — Sprint 3 sẽ mở PaymentDialog */}
+          {/* Button Thanh Toán — Mở PaymentDialog */}
           <button
+            onClick={() => setPaymentOpen(true)}
             className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg active:scale-[0.98]"
           >
             Thanh toán ({getTotalItems()} món)
           </button>
         </div>
       )}
+
+      {/* Payment Dialog */}
+      <PaymentDialog open={paymentOpen} onOpenChange={setPaymentOpen} />
     </div>
   );
 }

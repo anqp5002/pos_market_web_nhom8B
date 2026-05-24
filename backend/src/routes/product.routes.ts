@@ -1,19 +1,16 @@
-import { Router, Request, Response } from 'express';
-import prisma from '../config/db';
+import { Router } from 'express';
+import * as productCtrl from '../controllers/product.controller';
+import { roleMiddleware } from '../middleware/auth.middleware';
 
 const router = Router();
 
-// GET /api/products - Lấy danh sách sản phẩm (đã include category)
-router.get('/', async (_req: Request, res: Response) => {
-  try {
-    const products = await prisma.sanPham.findMany({
-      include: { category: true },
-      orderBy: { name: 'asc' },
-    });
-    res.json({ success: true, data: products });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Lỗi server' });
-  }
-});
+// === Cả Admin + Cashier đều được xem ===
+router.get('/', productCtrl.getAll);
+router.get('/:id', productCtrl.getById);
+
+// === Chỉ Admin mới được tạo/sửa/xóa ===
+router.post('/', roleMiddleware('Admin'), productCtrl.create);
+router.put('/:id', roleMiddleware('Admin'), productCtrl.update);
+router.delete('/:id', roleMiddleware('Admin'), productCtrl.remove);
 
 export default router;

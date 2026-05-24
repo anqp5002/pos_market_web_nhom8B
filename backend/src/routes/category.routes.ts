@@ -1,18 +1,16 @@
 import { Router } from 'express';
 import * as categoryCtrl from '../controllers/category.controller';
+import { roleMiddleware } from '../middleware/auth.middleware';
 
 const router = Router();
 
-// GET    /api/categories     - Danh sách danh mục
-// GET    /api/categories/:id - Chi tiết danh mục
-// POST   /api/categories     - Tạo danh mục
-// PUT    /api/categories/:id - Sửa danh mục
-// DELETE /api/categories/:id - Xóa danh mục
-
+// === Cả Admin + Cashier đều được xem ===
 router.get('/', categoryCtrl.getAll);
 router.get('/:id', categoryCtrl.getById);
-router.post('/', categoryCtrl.create);
-router.put('/:id', categoryCtrl.update);
-router.delete('/:id', categoryCtrl.remove);
+
+// === Chỉ Admin mới được tạo/sửa/xóa ===
+router.post('/', roleMiddleware('Admin'), categoryCtrl.create);
+router.put('/:id', roleMiddleware('Admin'), categoryCtrl.update);
+router.delete('/:id', roleMiddleware('Admin'), categoryCtrl.remove);
 
 export default router;

@@ -4,7 +4,17 @@ import * as orderService from '../services/order.service';
 // POST /api/orders
 export const create = async (req: Request, res: Response) => {
   try {
-    const order = await orderService.createOrder(req.body);
+    // Lấy nhanVienId từ JWT token (đã được authMiddleware gắn vào req.user)
+    const nhanVienId = req.user?.userId;
+    if (!nhanVienId) {
+      res.status(401).json({ error: 'Không xác định được nhân viên từ token' });
+      return;
+    }
+
+    const order = await orderService.createOrder({
+      ...req.body,
+      nhanVienId, // Ghi đè nhanVienId từ token — KHÔNG tin client
+    });
     res.status(201).json(order);
   } catch (err: any) {
     console.error('Error creating order:', err);

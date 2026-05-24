@@ -1,15 +1,13 @@
 import ProductGrid from "@/components/pos/ProductGrid";
 import CartSidebar from "@/components/cart/CartSidebar";
+import { authFetch } from "@/lib/api";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
-
-// Server Component: fetch data từ Backend
+// Server Component: fetch data từ Backend (có JWT token)
 async function getProducts() {
   try {
-    const res = await fetch(`${API_URL}/products`, {
+    const data = await authFetch<{ success: boolean; data: any[] }>("/products", {
       cache: "no-store",
     });
-    const data = await res.json();
     return data.data || [];
   } catch {
     return [];

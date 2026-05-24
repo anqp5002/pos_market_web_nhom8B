@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import ProductCard from "./ProductCard";
 import ProductSearch from "./ProductSearch";
 import { useCartStore } from "@/stores/cartStore";
@@ -24,6 +24,69 @@ export default function ProductGrid({ products, categories }: ProductGridProps) 
   const [activeCategory, setActiveCategory] = useState("Tất cả");
   const addItem = useCartStore((s) => s.addItem);
 
+  // === Task 4.3: Barcode Scanner Keyboard Listener ===
+  // Máy quét mã vạch gửi ký tự rất nhanh (< 50ms/char) rồi kết thúc bằng Enter
+  const barcodeBufferRef = useRef("");
+  const lastKeyTimeRef = useRef(0);
+  const barcodeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleBarcodeDetected = useCallback(
+    (barcode: string) => {
+      const found = products.find((p) => p.barcode === barcode);
+      if (found) {
+        addItem({
+          id: found.id,
+          name: found.name,
+          price: found.price,
+          barcode: found.barcode,
+        });
+      }
+    },
+    [products, addItem]
+  );
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Bỏ qua nếu đang focus vào input/textarea
+      const target = e.target as HTMLElement;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
+
+      const now = Date.now();
+      const timeDiff = now - lastKeyTimeRef.current;
+
+      if (e.key === "Enter" && barcodeBufferRef.current.length >= 4) {
+        // Enter + đủ dài = barcode scan hoàn tất
+        e.preventDefault();
+        handleBarcodeDetected(barcodeBufferRef.current);
+        barcodeBufferRef.current = "";
+        return;
+      }
+
+      // Nếu khoảng cách > 100ms = người gõ tay, reset buffer
+      if (timeDiff > 100) {
+        barcodeBufferRef.current = "";
+      }
+
+      // Chỉ nhận ký tự alphanumeric
+      if (e.key.length === 1 && /^[a-zA-Z0-9]$/.test(e.key)) {
+        barcodeBufferRef.current += e.key;
+        lastKeyTimeRef.current = now;
+
+        // Auto-clear buffer sau 500ms nếu không có Enter
+        if (barcodeTimeoutRef.current) clearTimeout(barcodeTimeoutRef.current);
+        barcodeTimeoutRef.current = setTimeout(() => {
+          barcodeBufferRef.current = "";
+        }, 500);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      if (barcodeTimeoutRef.current) clearTimeout(barcodeTimeoutRef.current);
+    };
+  }, [handleBarcodeDetected]);
+
   // Lọc sản phẩm theo search + category
   const filtered = useMemo(() => {
     return products.filter((p) => {
@@ -37,17 +100,9 @@ export default function ProductGrid({ products, categories }: ProductGridProps) 
     });
   }, [products, searchQuery, activeCategory]);
 
-  // Xử lý quét barcode: tìm SP và thêm vào giỏ ngay
+  // Xử lý quét barcode từ ô input: tìm SP và thêm vào giỏ ngay
   const handleBarcodeSubmit = (barcode: string) => {
-    const found = products.find((p) => p.barcode === barcode);
-    if (found) {
-      addItem({
-        id: found.id,
-        name: found.name,
-        price: found.price,
-        barcode: found.barcode,
-      });
-    }
+    handleBarcodeDetected(barcode);
   };
 
   return (
