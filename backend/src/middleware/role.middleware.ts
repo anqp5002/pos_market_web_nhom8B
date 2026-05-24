@@ -10,8 +10,8 @@ export const requireAdmin = (req: Request, res: Response, next: NextFunction) =>
     return;
   }
 
-  // Allow if role is ADMIN or Quản Trị Viên or roleId is 1 (typically admin)
-  if (user.role?.name !== 'ADMIN' && user.role?.name !== 'Quản Trị Viên' && user.roleId !== 1) {
+  // Allow if role is ADMIN or Admin or Quản Trị Viên
+  if (user.role !== 'ADMIN' && user.role !== 'Admin' && user.role !== 'Quản Trị Viên') {
     res.status(403).json({ error: 'Chỉ Quản Trị Viên mới có quyền truy cập chức năng này' });
     return;
   }

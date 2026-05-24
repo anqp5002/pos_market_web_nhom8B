@@ -16,6 +16,7 @@ interface CreateProductData {
 }
 
 interface UpdateProductData {
+  barcode?: string;
   name?: string;
   price?: number;
   stock?: number;

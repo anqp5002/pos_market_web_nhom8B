@@ -4,7 +4,8 @@ export const createOrderSchema = z.object({
   nhanVienId: z
     .number({ message: 'ID nhân viên là bắt buộc' })
     .int()
-    .positive('ID nhân viên phải > 0'),
+    .positive('ID nhân viên phải > 0')
+    .optional(),
   caLamViecId: z
     .number({ message: 'ID ca làm việc là bắt buộc' })
     .int()

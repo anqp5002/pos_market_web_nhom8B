@@ -91,7 +91,7 @@ export const createOrder = async (data: CreateOrderInput) => {
     // 6. Tạo đơn hàng mới
     const order = await tx.donHang.create({
       data: {
-        nhanVienId,
+        nhanVienId: nhanVienId!,
         caLamViecId,
         khachHangId,
         total: finalTotal,
