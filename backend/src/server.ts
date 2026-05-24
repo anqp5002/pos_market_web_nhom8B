@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
+import os from 'os';
 import authRoutes from './routes/auth.routes';
 import productRoutes from './routes/product.routes';
 import categoryRoutes from './routes/category.routes';
@@ -17,7 +18,7 @@ const PORT = process.env.PORT || 4000;
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: true,
   credentials: true,
 }));
 app.use(helmet());
@@ -46,10 +47,29 @@ app.use(errorMiddleware);
 
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📋 Health check: http://localhost:${PORT}/api/health`);
-  console.log(`🔐 Auth API: http://localhost:${PORT}/api/auth/login`);
+app.listen(Number(PORT), '0.0.0.0', () => {
+  // Get LAN IP dynamically
+  const getLanIp = () => {
+    const interfaces = os.networkInterfaces();
+    for (const devName in interfaces) {
+      const iface = interfaces[devName];
+      if (iface) {
+        for (const alias of iface) {
+          if (alias.family === 'IPv4' && !alias.internal) {
+            return alias.address;
+          }
+        }
+      }
+    }
+    return 'localhost';
+  };
+  const LAN_IP = getLanIp();
+
+  console.log(`🚀 Server running on:`);
+  console.log(`   - Local: http://localhost:${PORT}`);
+  console.log(`   - LAN:   http://${LAN_IP}:${PORT}`);
+  console.log(`📋 Health check: http://${LAN_IP}:${PORT}/api/health`);
+  console.log(`🔐 Auth API: http://${LAN_IP}:${PORT}/api/auth/login`);
 });
 
 export default app;
