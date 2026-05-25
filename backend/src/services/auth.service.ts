@@ -103,6 +103,38 @@ export class AuthService {
 
     return { accessToken };
   }
+
+  /**
+   * Thay đổi mật khẩu nhân viên
+   * FR-03: Cập nhật thông tin bảo mật
+   */
+  async changePassword(userId: number, currentPassword: string, newPassword: string) {
+    // 1. Tìm nhân viên
+    const nhanVien = await prisma.nhanVien.findUnique({
+      where: { id: userId },
+    });
+
+    if (!nhanVien) {
+      throw new Error('Nhân viên không tồn tại');
+    }
+
+    // 2. So sánh mật khẩu hiện tại
+    const isValidPassword = await bcrypt.compare(currentPassword, nhanVien.password);
+    if (!isValidPassword) {
+      throw new Error('Mật khẩu hiện tại không đúng');
+    }
+
+    // 3. Hash mật khẩu mới
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    // 4. Cập nhật vào DB
+    await prisma.nhanVien.update({
+      where: { id: userId },
+      data: { password: hashedNewPassword },
+    });
+
+    return { success: true };
+  }
 }
 
 export const authService = new AuthService();

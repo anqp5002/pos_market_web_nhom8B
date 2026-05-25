@@ -13,4 +13,7 @@ router.post('/refresh', (req, res) => authController.refresh(req, res));
 // GET /api/auth/me — Lấy thông tin user (cần đăng nhập)
 router.get('/me', authMiddleware, (req, res) => authController.me(req, res));
 
+// POST /api/auth/change-password — Đổi mật khẩu nhân viên (cần đăng nhập)
+router.post('/change-password', authMiddleware, (req, res) => authController.changePassword(req, res));
+
 export default router;
