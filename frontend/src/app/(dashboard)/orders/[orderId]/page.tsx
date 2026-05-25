@@ -1,3 +1,4 @@
+import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
@@ -10,6 +11,15 @@ interface PageProps {
     orderId: string;
   }> | {
     orderId: string;
+  };
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const resolvedParams = await (params as any);
+  const orderId = resolvedParams?.orderId || "";
+  return {
+    title: `Chi Tiết Đơn Hàng #${orderId}`,
+    description: `Chi tiết sản phẩm, trạng thái thanh toán và thông tin hóa đơn cho đơn hàng #${orderId} trên POS Market.`,
   };
 }
 

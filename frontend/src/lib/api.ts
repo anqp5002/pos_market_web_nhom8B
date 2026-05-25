@@ -35,12 +35,14 @@ export async function apiFetch<T>(
     }
   }
 
+  const { headers: customHeaders, ...restOptions } = fetchOptions;
+
   const res = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
-      ...fetchOptions.headers,
+      ...customHeaders,
     },
-    ...fetchOptions,
+    ...restOptions,
   });
 
   if (!res.ok) {

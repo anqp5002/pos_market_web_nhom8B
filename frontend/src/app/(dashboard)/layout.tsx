@@ -54,11 +54,10 @@ export default async function DashboardLayout({
           </Link>
         </nav>
         <div className="p-4 border-t">
-          <Link href="#" className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
+          <Link href="/settings" className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
             <Settings className="w-5 h-5" />
             <span>Cài Đặt</span>
           </Link>
-
         </div>
       </aside>
 
