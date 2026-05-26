@@ -13,6 +13,7 @@ import employeeRoutes from './routes/employee.routes';
 import paymentRoutes from './routes/payment.routes';
 import reportRoutes from './routes/report.routes';
 import shiftRoutes from './routes/shift.routes';
+import aiRoutes from './routes/ai.routes';
 import { authMiddleware } from './middleware/auth.middleware';
 import { errorMiddleware } from './middleware/error.middleware';
 
@@ -53,6 +54,7 @@ app.use('/api/employees', authMiddleware, employeeRoutes);
 app.use('/api/payments', authMiddleware, paymentRoutes);
 app.use('/api/reports', authMiddleware, reportRoutes);
 app.use('/api/shifts', authMiddleware, shiftRoutes);
+app.use('/api/ai', authMiddleware, aiRoutes);
 
 // === WEBHOOK Routes (public — PayOS gọi từ bên ngoài) ===
 app.use('/api/webhook', paymentRoutes);

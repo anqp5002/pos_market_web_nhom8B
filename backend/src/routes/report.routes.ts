@@ -12,4 +12,13 @@ router.get('/sales-chart', reportCtrl.getSalesChart);
 // GET /api/reports/top-products?limit=10&days=30
 router.get('/top-products', reportCtrl.getTopProducts);
 
+// GET /api/reports/daily        - Báo cáo doanh thu hàng ngày
+router.get('/daily', reportCtrl.getDaily);
+
+// GET /api/reports/period       - Báo cáo doanh thu theo chu kỳ (startDate, endDate)
+router.get('/period', reportCtrl.getPeriod);
+
+// GET /api/reports/export       - Xuất báo cáo doanh thu ra CSV/Excel
+router.get('/export', reportCtrl.exportReport);
+
 export default router;
