@@ -48,7 +48,7 @@ export default async function DashboardLayout({
             <Package className="w-5 h-5" />
             <span>Sản Phẩm</span>
           </Link>
-          <Link href="#" className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
+          <Link href="/customers" className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
             <Users className="w-5 h-5" />
             <span>Khách Hàng</span>
           </Link>

@@ -1,19 +1,24 @@
 import { Router } from 'express';
-import prisma from '../config/prisma';
+import * as customerController from '../controllers/customer.controller';
 
 const router = Router();
 
-// GET /api/customers - Lấy danh sách khách hàng mẫu
-router.get('/', async (req, res) => {
-  try {
-    const customers = await prisma.khachHang.findMany({
-      orderBy: { name: 'asc' },
-    });
-    res.json(customers);
-  } catch (err: any) {
-    console.error('Error fetching customers:', err);
-    res.status(500).json({ error: 'Lỗi lấy danh sách khách hàng' });
-  }
-});
+// GET /api/customers?search=&page=&limit=
+router.get('/', customerController.getAll);
+
+// GET /api/customers/phone/:phone — tìm nhanh theo SĐT (dùng trong POS)
+router.get('/phone/:phone', customerController.getByPhone);
+
+// GET /api/customers/:id
+router.get('/:id', customerController.getById);
+
+// POST /api/customers
+router.post('/', customerController.create);
+
+// PUT /api/customers/:id
+router.put('/:id', customerController.update);
+
+// DELETE /api/customers/:id
+router.delete('/:id', customerController.remove);
 
 export default router;
