@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+const API_URL = "http://localhost:4000/api";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [

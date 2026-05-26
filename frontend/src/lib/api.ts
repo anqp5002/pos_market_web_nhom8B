@@ -1,6 +1,17 @@
 import { auth } from '@/lib/auth';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+/**
+ * Xác định API URL động: client-side dùng hostname (hỗ trợ LAN),
+ * server-side dùng localhost (loopback tin cậy).
+ */
+const getApiBase = () => {
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    return `http://${host}:4000/api`;
+  }
+  // Server-side: Always use localhost for absolute reliability on the host machine
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+};
 
 interface FetchOptions extends RequestInit {
   params?: Record<string, string | number | undefined>;
@@ -14,6 +25,7 @@ export async function apiFetch<T>(
   options: FetchOptions = {}
 ): Promise<T> {
   const { params, ...fetchOptions } = options;
+  const API_BASE = getApiBase();
 
   let url = `${API_BASE}${endpoint}`;
 
@@ -31,25 +43,28 @@ export async function apiFetch<T>(
     }
   }
 
-  const { headers, ...restOptions } = fetchOptions;
+  const { headers: customHeaders, ...restOptions } = fetchOptions;
 
   const res = await fetch(url, {
     ...restOptions,
     headers: {
       'Content-Type': 'application/json',
-      ...headers,
+      ...customHeaders,
     },
   });
 
-  // Ghi log request payload để debug
-  if (url.includes('/products') && ['POST', 'PUT'].includes(fetchOptions.method || '')) {
-    console.log(`[DEBUG API] ${fetchOptions.method} ${url}`, fetchOptions.body);
-  }
-
   if (!res.ok) {
-    const error = await res.json().catch(() => ({ error: 'Lỗi không xác định' }));
-    console.error(`[DEBUG API ERROR]`, error);
-    throw new Error(error.message || error.error || `HTTP Error ${res.status}`);
+    let errorMessage = `HTTP Error ${res.status}`;
+    try {
+      const errorData = await res.json();
+      errorMessage = errorData.error || errorData.message || errorMessage;
+    } catch {
+      try {
+        const text = await res.text();
+        errorMessage = `HTTP ${res.status}: ${text.slice(0, 150)}`;
+      } catch {}
+    }
+    throw new Error(errorMessage);
   }
 
   return res.json();

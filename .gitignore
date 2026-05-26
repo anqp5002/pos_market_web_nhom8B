@@ -1,3 +1,9 @@
 node_modules/
 .env
 web_implementation_plan.md
+plan.md
+
+# build and development files
+/backend/dist/
+/backend/scratch/
+/backend/src/generated/

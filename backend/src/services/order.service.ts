@@ -50,7 +50,7 @@ export const createOrder = async (data: CreateOrderInput) => {
     let subTotal = 0;
 
     // Tạo cấu trúc lưu thông tin chi tiết các mặt hàng để insert
-    const orderItemsToCreate = [];
+    const orderItemsToCreate: any[] = [];
 
     for (const item of items) {
       const product = dbProducts.find((p) => p.id === item.sanPhamId)!;
@@ -253,10 +253,11 @@ export const processPayment = async (orderId: number, data: { ptttId: number; am
       throw new Error('Phương thức thanh toán không hợp lệ');
     }
 
+    const grandTotal = Math.round(order.total * 1.1);
     // 4. Kiểm tra số tiền khách trả có đủ không
-    if (amount < order.total) {
+    if (amount < grandTotal) {
       throw new Error(
-        `Số tiền thanh toán không đủ (Yêu cầu: ${order.total} ₫, Khách trả: ${amount} ₫)`
+        `Số tiền thanh toán không đủ (Yêu cầu: ${grandTotal} ₫, Khách trả: ${amount} ₫)`
       );
     }
 
@@ -298,7 +299,7 @@ export const processPayment = async (orderId: number, data: { ptttId: number; am
       order: updatedOrder,
       transaction,
       invoice,
-      change: amount - order.total, // Tiền thừa trả khách
+      change: amount - (order.total * 1.1), // Tiền thừa trả khách (bao gồm cả VAT)
     };
   });
 };

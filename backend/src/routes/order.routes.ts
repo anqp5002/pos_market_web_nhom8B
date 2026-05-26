@@ -14,8 +14,13 @@ const router = Router();
 
 router.post('/', validateBody(createOrderSchema), orderCtrl.create);
 router.get('/', orderCtrl.getAll);
+router.get('/active-shift', orderCtrl.getActiveShift);
+router.get('/:id/pdf', orderCtrl.getPdf);
+router.post('/:id/email', orderCtrl.sendEmail);
 router.get('/:id', orderCtrl.getById);
+
 router.patch('/:id/status', orderCtrl.updateStatus);
 router.post('/:id/pay', validateBody(createPaymentSchema), orderCtrl.pay);
+
 
 export default router;

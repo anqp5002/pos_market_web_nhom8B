@@ -22,3 +22,4 @@ export const productSchema = z.object({
 });
 
 export type ProductFormData = z.infer<typeof productSchema>;
+export type ProductFormValues = ProductFormData; // Alias cho backward compatibility

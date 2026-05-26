@@ -106,9 +106,10 @@ export default function ProductTable({
   };
 
   // Category filter
-  const handleCategoryChange = (value: string) => {
-    setCategoryFilter(value);
-    fetchProducts(1, search, value);
+  const handleCategoryChange = (value: string | null) => {
+    const val = value || 'all';
+    setCategoryFilter(val);
+    fetchProducts(1, search, val);
   };
 
   // Format giá VNĐ

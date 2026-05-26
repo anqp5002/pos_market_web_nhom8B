@@ -20,8 +20,10 @@ export default function CartSidebar() {
   const formatVND = (amount: number) =>
     amount.toLocaleString("vi-VN") + "₫";
 
+  const total = getTotalPrice();
+
   return (
-    <div className="flex flex-col h-full bg-white rounded-xl border border-gray-200 shadow-sm">
+    <div className="flex flex-col h-full bg-white rounded-xl border border-gray-200 shadow-sm print:hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
         <div className="flex items-center gap-2">
@@ -107,13 +109,11 @@ export default function CartSidebar() {
       {/* Summary Footer */}
       {items.length > 0 && (
         <div className="border-t border-gray-100 px-4 py-3 space-y-2">
-          {/* Tạm tính */}
           <div className="flex justify-between text-sm text-gray-600">
             <span>Tạm tính</span>
             <span>{formatVND(getSubtotal())}</span>
           </div>
 
-          {/* Chiết khấu */}
           {getDiscountAmount() > 0 && (
             <div className="flex justify-between text-sm text-green-600">
               <span>Chiết khấu</span>
@@ -121,16 +121,14 @@ export default function CartSidebar() {
             </div>
           )}
 
-          {/* VAT */}
           <div className="flex justify-between text-sm text-gray-600">
             <span>VAT (10%)</span>
             <span>+{formatVND(getVatAmount())}</span>
           </div>
 
-          {/* Tổng */}
           <div className="flex justify-between text-lg font-bold text-gray-900 pt-2 border-t border-gray-100">
             <span>Tổng cộng</span>
-            <span className="text-blue-600">{formatVND(getTotalPrice())}</span>
+            <span className="text-blue-600">{formatVND(total)}</span>
           </div>
 
           {/* Button Thanh Toán — Mở PaymentDialog */}

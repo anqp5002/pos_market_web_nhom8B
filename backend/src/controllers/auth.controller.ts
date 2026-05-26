@@ -82,6 +82,53 @@ export class AuthController {
       });
     }
   }
+
+  /**
+   * POST /api/auth/change-password
+   * FR-03: Thay đổi mật khẩu nhân viên
+   */
+  async changePassword(req: Request, res: Response) {
+    try {
+      const user = (req as any).user;
+      if (!user || !user.userId) {
+        res.status(401).json({
+          success: false,
+          message: 'Không tìm thấy thông tin người dùng đăng nhập',
+        });
+        return;
+      }
+
+      const { currentPassword, newPassword } = req.body;
+
+      if (!currentPassword || !newPassword) {
+        res.status(400).json({
+          success: false,
+          message: 'Vui lòng cung cấp mật khẩu hiện tại và mật khẩu mới',
+        });
+        return;
+      }
+
+      if (newPassword.length < 6) {
+        res.status(400).json({
+          success: false,
+          message: 'Mật khẩu mới phải có độ dài ít nhất 6 ký tự',
+        });
+        return;
+      }
+
+      await authService.changePassword(user.userId, currentPassword, newPassword);
+
+      res.json({
+        success: true,
+        message: 'Thay đổi mật khẩu thành công',
+      });
+    } catch (error: any) {
+      res.status(400).json({
+        success: false,
+        message: error.message || 'Thay đổi mật khẩu thất bại',
+      });
+    }
+  }
 }
 
 export const authController = new AuthController();
