@@ -308,7 +308,9 @@ export default function EmployeeTable({ employees: initialEmployees, roles }: Pr
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Chọn vai trò" />
+                  <SelectValue placeholder="Chọn vai trò">
+                    {roles.find((r) => String(r.id) === String(formData.roleId))?.name}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {roles.map((role) => (

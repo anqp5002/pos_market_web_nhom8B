@@ -27,7 +27,18 @@ async function getRoles(token: string) {
     });
     if (!res.ok) throw new Error("API not ok");
     const data = await res.json();
-    return data.data || [];
+    let roles = data.data || [];
+    
+    // Lọc trùng lặp vai trò (do có thể DB bị seed trùng ADMIN / Admin)
+    const seen = new Set();
+    roles = roles.filter((r: any) => {
+      const key = r.name.toUpperCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    return roles;
   } catch {
     // Fallback roles nếu API chưa có
     return [
