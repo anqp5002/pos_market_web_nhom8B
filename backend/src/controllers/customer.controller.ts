@@ -61,7 +61,7 @@ export const create = async (req: Request, res: Response) => {
     res.status(201).json(customer);
   } catch (err: any) {
     if (err instanceof ZodError) {
-      const messages = err.errors.map((e) => e.message).join(', ');
+      const messages = err.issues.map((e) => e.message).join(', ');
       res.status(400).json({ error: messages });
       return;
     }
@@ -87,7 +87,7 @@ export const update = async (req: Request, res: Response) => {
     res.json(customer);
   } catch (err: any) {
     if (err instanceof ZodError) {
-      const messages = err.errors.map((e) => e.message).join(', ');
+      const messages = err.issues.map((e) => e.message).join(', ');
       res.status(400).json({ error: messages });
       return;
     }

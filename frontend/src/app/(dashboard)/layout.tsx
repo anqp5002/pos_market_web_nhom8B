@@ -1,17 +1,11 @@
 import Link from "next/link";
 import { 
-  ShoppingCart, 
-  Package, 
-  Users, 
-  UserCog,
-  FileText, 
-  BarChart3,
-  Clock, 
   Settings,
   LogOut
 } from "lucide-react";
 import { auth, signOut } from "@/lib/auth";
 import StockAlert from "@/components/layout/StockAlert";
+import SidebarNav from "@/components/layout/SidebarNav";
 
 export default async function DashboardLayout({
   children,
@@ -31,39 +25,7 @@ export default async function DashboardLayout({
         <div className="p-6">
           <h1 className="text-2xl font-bold text-gray-800">POS System</h1>
         </div>
-        <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
-          <Link href="/reports" className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
-            <BarChart3 className="w-5 h-5" />
-            <span>Báo cáo</span>
-          </Link>
-          <Link href="/pos" className="flex items-center gap-3 px-3 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-md">
-            <ShoppingCart className="w-5 h-5" />
-            <span className="font-medium">Bán Hàng</span>
-          </Link>
-          <Link href="/orders" className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
-            <FileText className="w-5 h-5" />
-            <span>Đơn Hàng</span>
-          </Link>
-          <Link href="/products" className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
-            <Package className="w-5 h-5" />
-            <span>Sản Phẩm</span>
-          </Link>
-          <Link href="/customers" className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
-            <Users className="w-5 h-5" />
-            <span>Khách Hàng</span>
-          </Link>
-          {/* Chỉ Admin mới thấy link Nhân viên */}
-          {isAdmin && (
-            <Link href="/employees" className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
-              <UserCog className="w-5 h-5" />
-              <span>Nhân Viên</span>
-            </Link>
-          )}
-          <Link href="/shift" className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
-            <Clock className="w-5 h-5" />
-            <span>Ca Làm Việc</span>
-          </Link>
-        </nav>
+        <SidebarNav isAdmin={isAdmin} />
         <div className="p-4 border-t">
           <Link href="/settings" className="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md">
             <Settings className="w-5 h-5" />

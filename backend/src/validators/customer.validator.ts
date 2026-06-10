@@ -6,7 +6,7 @@ import { z } from 'zod';
  */
 export const createCustomerSchema = z.object({
   name: z
-    .string({ required_error: 'Tên khách hàng là bắt buộc' })
+    .string({ message: 'Tên khách hàng là bắt buộc' })
     .min(1, 'Tên khách hàng không được để trống')
     .max(100, 'Tên không quá 100 ký tự')
     .transform((val) => val.trim()),

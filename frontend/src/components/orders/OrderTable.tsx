@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, getClientToken } from '@/lib/api';
 import {
   Table,
   TableBody,
@@ -104,8 +104,11 @@ export default function OrderTable({
 
     setCancellingId(id);
     try {
+      const token = await getClientToken();
+      const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
       await apiFetch(`/orders/${id}/status`, {
         method: 'PATCH',
+        headers,
         body: JSON.stringify({ status: 'CANCELLED' }),
       });
       // Refresh page data

@@ -92,7 +92,7 @@ export const createOrder = async (data: CreateOrderInput) => {
     const order = await tx.donHang.create({
       data: {
         nhanVienId: nhanVienId!,
-        caLamViecId,
+        caLamViecId: caLamViecId!,
         khachHangId,
         total: finalTotal,
         status: 'PENDING', // Mặc định là PENDING chờ thanh toán
@@ -184,7 +184,7 @@ export const findOrderById = (id: number) =>
 export const updateOrderStatus = async (id: number, status: string) => {
   // Nếu hủy đơn hàng, cần hoàn lại số lượng tồn kho sản phẩm
   if (status === 'CANCELLED') {
-    return prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx) => {
       const order = await tx.donHang.findUnique({
         where: { id },
         include: { chiTiets: true },
@@ -205,19 +205,21 @@ export const updateOrderStatus = async (id: number, status: string) => {
         });
       }
 
-      return tx.donHang.update({
+      await tx.donHang.update({
         where: { id },
         data: { status },
-        include: { chiTiets: true },
       });
     });
+    
+    return findOrderById(id);
   }
 
-  return prisma.donHang.update({
+  await prisma.donHang.update({
     where: { id },
     data: { status },
-    include: { chiTiets: true },
   });
+  
+  return findOrderById(id);
 };
 
 // Xử lý thanh toán đơn hàng (Giao dịch & Hóa đơn)

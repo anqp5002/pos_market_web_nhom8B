@@ -15,9 +15,20 @@ export const create = async (req: Request, res: Response) => {
       return;
     }
 
+    // Tìm ca làm việc đang mở của nhân viên
+    const shift = await prisma.caLamViec.findFirst({
+      where: { nhanVienId, status: 'OPEN' }
+    });
+
+    if (!shift) {
+      res.status(400).json({ error: 'Bạn chưa mở ca làm việc. Vui lòng mở ca trước khi bán hàng.' });
+      return;
+    }
+
     const order = await orderService.createOrder({
       ...req.body,
       nhanVienId, // Ghi đè nhanVienId từ token — KHÔNG tin client
+      caLamViecId: shift.id, // Tự động gán ca đang mở
     });
     res.status(201).json(order);
   } catch (err: any) {

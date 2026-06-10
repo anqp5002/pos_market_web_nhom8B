@@ -56,7 +56,19 @@ export function roleMiddleware(...allowedRoles: string[]) {
       return;
     }
 
-    if (!allowedRoles.includes(user.role)) {
+    const userRoleLower = user.role?.toLowerCase() || '';
+    const isAllowed = allowedRoles.some(role => {
+      const allowedLower = role.toLowerCase();
+      if (allowedLower === 'admin') {
+        return ['admin', 'quản trị viên'].includes(userRoleLower);
+      }
+      if (allowedLower === 'cashier') {
+        return ['cashier', 'thu ngân'].includes(userRoleLower);
+      }
+      return userRoleLower === allowedLower;
+    });
+
+    if (!isAllowed) {
       res.status(403).json({
         success: false,
         message: `Bạn không có quyền truy cập. Yêu cầu vai trò: ${allowedRoles.join(', ')}`,

@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { apiFetch } from '@/lib/api';
+import { authFetch } from '@/lib/api';
 import OrderDetail from '@/components/orders/OrderDetail';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 async function getOrder(id: string) {
   try {
-    return await apiFetch<any>(`/orders/${id}`, {
+    return await authFetch<any>(`/orders/${id}`, {
       cache: 'no-store',
     });
   } catch (error) {

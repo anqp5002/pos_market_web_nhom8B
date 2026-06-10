@@ -32,6 +32,7 @@ export const openShift = async (nhanVienId: number, openingBalance: number) => {
     },
     include: {
       nhanVien: { select: { id: true, fullName: true, username: true } },
+      _count: { select: { donHangs: true } },
     },
   });
 

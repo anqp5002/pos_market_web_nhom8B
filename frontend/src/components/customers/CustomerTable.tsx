@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, getClientToken } from '@/lib/api';
 import {
   Table,
   TableBody,
@@ -48,10 +48,13 @@ export default function CustomerTable({
   const fetchCustomers = async (page = 1, searchTerm = search) => {
     setLoading(true);
     try {
+      const token = await getClientToken();
+      const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
       const result = await apiFetch<{ data: Customer[]; pagination: Pagination }>(
         '/customers',
         {
           cache: 'no-store',
+          headers,
           params: {
             page,
             limit: 10,
@@ -72,7 +75,9 @@ export default function CustomerTable({
   const handleDelete = async (id: number, name: string) => {
     if (!confirm(`Xác nhận xóa khách hàng "${name}"?\nThao tác này không thể hoàn tác.`)) return;
     try {
-      await apiFetch(`/customers/${id}`, { method: 'DELETE' });
+      const token = await getClientToken();
+      const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+      await apiFetch(`/customers/${id}`, { method: 'DELETE', headers });
       fetchCustomers(pagination.page);
     } catch (err: any) {
       alert(err.message || 'Không thể xóa khách hàng');
