@@ -48,8 +48,8 @@ interface Order {
   chiTiets: ChiTiet[];
   giaoDichs?: any[];
   hoaDon?: {
-    invoiceCode?: string;
     invoiceNumber?: string;
+    printedAt?: string;
   } | null;
 }
 
@@ -182,30 +182,42 @@ export default function BillPreview({ order }: BillPreviewProps) {
       {/* CSS dành riêng cho chế độ In ấn trình duyệt (Giải quyết triệt để lỗi không hiển thị hoặc đè đè layout) */}
       <style dangerouslySetInnerHTML={{ __html: `
         @media print {
-          /* Ẩn hoàn toàn tất cả các phần tử khác trên body khi in */
+          /* Ẩn tất cả mọi thứ trên trang */
           body * {
             visibility: hidden !important;
           }
-          /* Chỉ hiển thị và định dạng vùng hóa đơn này */
+          
+          /* Chỉ hiển thị hóa đơn và các phần tử con của nó */
           #invoice-receipt, #invoice-receipt * {
             visibility: visible !important;
           }
+
+          /* Đặt lại thuộc tính của hộp thoại (Dialog) để nó không cản trở việc định vị hóa đơn */
+          div[role="dialog"] {
+            transform: none !important;
+            position: static !important;
+          }
+
+          /* Cố định hóa đơn ở góc trên cùng bên trái của trang in */
           #invoice-receipt {
             position: absolute !important;
-            left: 0 !important;
             top: 0 !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            border: none !important;
-            box-shadow: none !important;
-            padding: 0 !important;
+            left: 0 !important;
+            width: 80mm !important;
             margin: 0 !important;
+            padding: 4mm !important;
             background: white !important;
             color: black !important;
+            border: none !important;
+            box-shadow: none !important;
+          }
+
+          /* Đảm bảo các nút bấm in/tải PDF không bao giờ hiển thị trên giấy */
+          .print\\:hidden, .print\\:hidden * {
+            display: none !important;
           }
         }
       `}} />
-
       {/* Nút điều khiển (ẩn khi in) */}
       <div className="flex flex-wrap gap-3 justify-end print:hidden bg-slate-50 p-4 rounded-xl border border-slate-100 shadow-sm">
         <Button
@@ -293,141 +305,122 @@ export default function BillPreview({ order }: BillPreviewProps) {
         </div>
       )}
 
-      {/* Vùng Hóa Đơn Trực Quan - Định dạng in */}
-      <div 
-        id="invoice-receipt"
-        className="bg-white border rounded-xl shadow-lg max-w-[650px] mx-auto p-8 font-sans text-slate-800 border-slate-200 print:shadow-none print:border-none print:p-0 print:max-w-full"
-      >
-        {/* Store Header */}
-        <div className="text-center space-y-1.5 pb-6 border-b border-dashed border-slate-200">
-          <h2 className="text-2xl font-black text-slate-900 tracking-wider uppercase">POS MARKET - NHÓM 8B</h2>
-          <p className="text-xs text-slate-500 font-medium">Địa chỉ: 97 Man Thiện, Hiệp Phú, Thủ Đức, TP. HCM</p>
-          <p className="text-xs text-slate-500 font-medium">Hotline: 0123.456.789 | Email: contact@posmarket.com</p>
-        </div>
+      {/* Vùng Hóa Đơn Trực Quan - Định dạng in (80mm) */}
+      <div className="flex justify-center bg-gray-100/50 p-4 rounded-xl print:bg-transparent print:p-0">
+        <div 
+          id="invoice-receipt"
+          className="bg-white border shadow-sm mx-auto p-4 font-mono text-black print:shadow-none print:border-none print:p-0 print:m-0"
+          style={{ width: '80mm', maxWidth: '100%', fontSize: '12px', lineHeight: '1.4' }}
+        >
+          {/* Header */}
+          <div className="text-center mb-3">
+            <h2 className="text-base font-bold m-0 uppercase tracking-wide">SIÊU THỊ POS</h2>
+            <p className="m-0 text-[11px] text-gray-700">Nhóm 8B - POS Market</p>
+            <p className="m-0 text-[11px] text-gray-700">ĐT: 0123.456.789</p>
+          </div>
 
-        {/* Title */}
-        <div className="text-center py-6 space-y-1 bg-slate-50/50 rounded-lg my-4 print:bg-transparent">
-          <h3 className="text-lg font-black text-slate-900 tracking-widest uppercase">HÓA ĐƠN BÁN HÀNG</h3>
-          <p className="text-xs font-mono font-bold text-blue-600 tracking-wider">Mã: {invoiceCode}</p>
-        </div>
+          <div className="border-t border-dashed border-gray-400 my-2" />
 
-        {/* Bảng Thông Tin Chung (Invoice Header) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2.5 text-xs pb-4 border-b border-slate-100 print:grid-cols-2">
-          <div className="space-y-2">
-            <div>
-              <span className="text-slate-500 font-medium">Ma HD:</span>{' '}
-              <span className="font-bold text-slate-900 font-mono">{invoiceCode}</span>
+          {/* Info */}
+          <div className="text-[11px] mb-2 space-y-1">
+            <div className="flex justify-between">
+              <span>Số HĐ:</span>
+              <span className="font-bold">{invoiceCode}</span>
             </div>
-            <div>
-              <span className="text-slate-500 font-medium">Thu ngân:</span>{' '}
-              <span className="font-semibold text-slate-800">{order.nhanVien?.fullName || 'N/A'}</span>
+            <div className="flex justify-between">
+              <span>Mã đơn:</span>
+              <span>#{order.id}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Ngày:</span>
+              <span>{formatDate(order.createdAt)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Thu ngân:</span>
+              <span>{order.nhanVien?.fullName || 'N/A'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Khách hàng:</span>
+              <span>{order.khachHang?.name || 'Khách vãng lai'}</span>
             </div>
           </div>
 
-          <div className="space-y-2 md:text-right print:text-right">
-            <div>
-              <span className="text-slate-500 font-medium">Thời gian:</span>{' '}
-              <span className="font-semibold text-slate-800">{formatDate(order.createdAt)}</span>
-            </div>
-            <div>
-              <span className="text-slate-500 font-medium">Khách hàng:</span>{' '}
-              <span className="font-bold text-slate-900">
-                {order.khachHang?.name || 'Khách vãng lai'}
-              </span>
-            </div>
-          </div>
-        </div>
+          <div className="border-t border-dashed border-gray-400 my-2" />
 
-        {/* Bảng Chi Tiết Mặt Hàng (Invoice Details / Line Items) */}
-        <table className="w-full text-left text-xs border-collapse my-6">
-          <thead>
-            <tr className="border-b border-slate-200 font-bold text-slate-600 bg-slate-50/50 print:bg-transparent">
-              <th className="py-2.5 w-[35px] pl-2">STT</th>
-              <th className="py-2.5">Mặt Hàng (Mã dòng & Mã vạch)</th>
-              <th className="py-2.5 text-center w-[50px]">ĐVT</th>
-              <th className="py-2.5 text-right w-[85px]">Đơn Giá</th>
-              <th className="py-2.5 text-right w-[75px]">Chiết Khấu</th>
-              <th className="py-2.5 text-center w-[45px]">SL</th>
-              <th className="py-2.5 text-right w-[95px] pr-2">Thành Tiền</th>
-            </tr>
-          </thead>
-          <tbody>
-            {order.chiTiets.map((item, index) => {
-              const uom = getUOM(item.sanPham.name, item.sanPham.category?.name);
-              const lineDiscount = 0;
-              const lineTotal = (item.price * item.quantity) - lineDiscount;
-              return (
-                <tr key={item.id} className="border-b border-slate-100 text-slate-700 hover:bg-slate-50/30">
-                  <td className="py-3 text-slate-400 pl-2">{index + 1}</td>
-                  <td className="py-3">
-                    <div className="font-bold text-slate-900">{item.sanPham.name}</div>
-                    <div className="text-[10px] text-slate-400 font-mono mt-0.5">
-                      Dòng: #{item.id} | Barcode: {item.sanPham.barcode}
-                    </div>
+          {/* Items */}
+          <table className="w-full text-[11px] border-collapse mb-2">
+            <thead>
+              <tr className="border-b border-gray-300">
+                <th className="text-left pb-1 font-semibold">Tên SP</th>
+                <th className="text-center pb-1 w-[30px] font-semibold">SL</th>
+                <th className="text-right pb-1 font-semibold">T.Tiền</th>
+              </tr>
+            </thead>
+            <tbody>
+              {order.chiTiets.map((item, idx) => (
+                <tr key={idx} className="border-b border-gray-100 last:border-none">
+                  <td className="pt-1.5 pb-1 align-top">
+                    <div className="font-medium truncate max-w-[120px]">{item.sanPham.name}</div>
                   </td>
-                  <td className="py-3 text-center text-slate-600 font-medium">{uom}</td>
-                  <td className="py-3 text-right font-mono font-medium">{formatPrice(item.price)}</td>
-                  <td className="py-3 text-right font-mono text-slate-500">{formatPrice(lineDiscount)}</td>
-                  {/* SL hiển thị dạng số thực (Decimal) */}
-                  <td className="py-3 text-center font-bold font-mono text-slate-900">
-                    {Number(item.quantity).toFixed(1)}
-                  </td>
-                  <td className="py-3 text-right font-bold font-mono text-blue-600 pr-2">
-                    {formatPrice(lineTotal)}
+                  <td className="text-center pt-1.5 pb-1 align-top">{item.quantity}</td>
+                  <td className="text-right pt-1.5 pb-1 align-top">
+                    {formatPrice(item.price * item.quantity)}
                   </td>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
 
-        {/* Bill Total Summary */}
-        <div className="w-[320px] ml-auto space-y-2.5 text-xs pt-4 border-t border-slate-100">
-          <div className="flex justify-between text-slate-500">
-            <span>Cộng tiền hàng gốc:</span>
-            <span className="font-mono font-semibold text-slate-800">{formatPrice(order.total)}</span>
-          </div>
-          <div className="flex justify-between text-slate-500">
-            <span>Chiết khấu hóa đơn:</span>
-            <span className="font-mono text-green-600 font-semibold">-0 ₫</span>
-          </div>
-          <div className="flex justify-between text-slate-500">
-            <span>Thuế VAT (10%):</span>
-            <span className="font-mono font-semibold text-slate-800">+{formatPrice(vatAmount)}</span>
-          </div>
-          <div className="flex justify-between items-end pt-2.5 border-t border-dashed text-sm font-bold text-slate-900">
-            <span>Tổng cộng thanh toán:</span>
-            <span className="text-lg text-blue-600 font-mono font-black">{formatPrice(grandTotal)}</span>
+          <div className="border-t border-dashed border-gray-400 my-2" />
+
+          {/* Totals */}
+          <div className="text-[11px] space-y-1">
+            <div className="flex justify-between text-gray-700">
+              <span>Tạm tính:</span>
+              <span>{formatPrice(order.total)}</span>
+            </div>
+            <div className="flex justify-between text-gray-700">
+              <span>Chiết khấu:</span>
+              <span>-0 ₫</span>
+            </div>
+            <div className="flex justify-between text-gray-700">
+              <span>VAT (10%):</span>
+              <span>+{formatPrice(vatAmount)}</span>
+            </div>
+            <div className="flex justify-between font-bold text-[13px] border-t border-gray-400 mt-1 pt-1">
+              <span>TỔNG CỘNG:</span>
+              <span>{formatPrice(grandTotal)}</span>
+            </div>
           </div>
 
-          <div className="flex justify-between text-slate-500 pt-2 border-t border-slate-100">
-            <span>Phương thức thanh toán:</span>
-            <span className="font-semibold text-slate-800">
-              {ptttName === 'CASH' ? 'Tiền mặt' : ptttName === 'CREDIT_CARD' ? 'Thẻ ngân hàng' : 'Chuyển khoản QR'}
-            </span>
-          </div>
-          {ptttName === 'CASH' && (() => {
-            const customerPaid = order.giaoDichs?.[0]?.amount || grandTotal;
-            const changeAmt = customerPaid > grandTotal ? (customerPaid - grandTotal) : 0;
-            return (
-              <>
-                <div className="flex justify-between text-slate-500">
-                  <span>Tiền khách đưa:</span>
-                  <span className="font-mono font-semibold text-slate-800">{formatPrice(customerPaid)}</span>
-                </div>
-                <div className="flex justify-between text-slate-500">
-                  <span>Tiền thừa trả khách:</span>
-                  <span className="font-mono font-bold text-slate-900">{formatPrice(changeAmt)}</span>
-                </div>
-              </>
-            );
-          })()}
-        </div>
+          <div className="border-t border-dashed border-gray-400 my-2" />
 
-        {/* Receipt Footer */}
-        <div className="text-center text-[10px] text-slate-400 space-y-1.5 mt-10 pt-6 border-t border-dashed border-slate-200">
-          <p className="font-bold text-slate-700 text-xs italic">Cảm ơn Quý khách. Hẹn gặp lại!</p>
-          <p className="font-medium">Hóa đơn điện tử có mã xác thực lập trực tiếp từ POS Market</p>
+          {/* Payment */}
+          <div className="text-[11px] mt-1 space-y-1">
+            <div className="flex justify-between text-gray-700">
+              <span>Thanh toán ({ptttName === 'CASH' ? 'Tiền mặt' : ptttName === 'CREDIT_CARD' ? 'Thẻ' : 'QR'}):</span>
+              <span>{formatPrice(order.giaoDichs?.[0]?.amount || grandTotal)}</span>
+            </div>
+            {ptttName === 'CASH' && (() => {
+              const customerPaid = order.giaoDichs?.[0]?.amount || grandTotal;
+              const changeAmt = customerPaid > grandTotal ? (customerPaid - grandTotal) : 0;
+              if (changeAmt > 0) {
+                return (
+                  <div className="flex justify-between font-bold">
+                    <span>Tiền thối:</span>
+                    <span>{formatPrice(changeAmt)}</span>
+                  </div>
+                );
+              }
+              return null;
+            })()}
+          </div>
+
+          {/* Footer */}
+          <div className="text-center text-[10px] text-gray-600 mt-4 pt-2 border-t border-dashed border-gray-400">
+            <p className="m-0 font-bold italic mb-0.5">Cảm ơn Quý khách!</p>
+            <p className="m-0 text-[9px]">Hẹn gặp lại lần sau</p>
+          </div>
         </div>
       </div>
     </div>

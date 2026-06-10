@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { apiFetch } from '@/lib/api';
+import { authFetch } from '@/lib/api';
 import CustomerTable from '@/components/customers/CustomerTable';
 
 export const metadata: Metadata = {
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 async function getCustomers() {
   try {
-    return await apiFetch<{
+    return await authFetch<{
       data: any[];
       pagination: { page: number; limit: number; total: number; totalPages: number };
     }>('/customers', {

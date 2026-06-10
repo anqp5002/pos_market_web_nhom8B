@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { customerSchema, type CustomerFormData } from '@/lib/validators';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, getClientToken } from '@/lib/api';
 import {
   Dialog,
   DialogContent,
@@ -60,14 +60,19 @@ export default function CustomerForm({ customer, onSuccess }: CustomerFormProps)
         email: data.email || undefined,
       };
 
+      const token = await getClientToken();
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
       if (isEdit) {
         await apiFetch(`/customers/${customer.id}`, {
           method: 'PUT',
+          headers,
           body: JSON.stringify(payload),
         });
       } else {
         await apiFetch('/customers', {
           method: 'POST',
+          headers,
           body: JSON.stringify(payload),
         });
       }

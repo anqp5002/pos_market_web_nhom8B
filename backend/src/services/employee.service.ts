@@ -86,3 +86,10 @@ export async function updateEmployee(id: number, input: UpdateEmployeeInput) {
 export async function deleteEmployee(id: number) {
   return prisma.nhanVien.delete({ where: { id } });
 }
+
+/**
+ * Lấy danh sách vai trò
+ */
+export async function getRoles() {
+  return prisma.vaiTro.findMany({ orderBy: { id: 'asc' } });
+}

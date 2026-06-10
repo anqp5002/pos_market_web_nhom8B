@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, getClientToken } from '@/lib/api';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,14 +28,7 @@ import {
   FileText,
   UserCheck
 } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import BillPreview from '@/components/invoice/BillPreview';
+
 
 
 interface SanPham {
@@ -74,9 +67,8 @@ interface GiaoDich {
 
 interface HoaDon {
   id: number;
-  invoiceCode: string;
-  totalAmount: number;
-  createdAt: string;
+  invoiceNumber: string;
+  printedAt: string;
 }
 
 interface Order {
@@ -110,9 +102,43 @@ export default function OrderDetail({ order: initialOrder }: OrderDetailProps) {
   const router = useRouter();
   const [order, setOrder] = useState<Order>(initialOrder);
   const [cancelling, setCancelling] = useState(false);
-  const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
 
-  // Định dạng tiền tệ
+  const handlePrint = () => {
+    // Xóa iframe cũ nếu có để tránh rác DOM
+    const oldIframe = document.getElementById('print-iframe');
+    if (oldIframe) {
+      oldIframe.remove();
+    }
+
+    // Tạo một iframe ẩn
+    const iframe = document.createElement('iframe');
+    iframe.id = 'print-iframe';
+    // Không dùng display: none vì một số trình duyệt (Firefox) sẽ không load/in iframe bị none
+    iframe.style.position = 'absolute';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = 'none';
+    iframe.style.visibility = 'hidden';
+    
+    // Tải trang in gốc (không cần autoprint vì ta sẽ tự gọi lệnh in từ parent)
+    iframe.src = `/print/${order.id}`;
+    
+    iframe.onload = () => {
+      // Đợi một chút để CSS và fonts render xong
+      setTimeout(() => {
+        try {
+          if (iframe.contentWindow) {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+          }
+        } catch (e) {
+          console.error("Lỗi khi in iframe:", e);
+        }
+      }, 500);
+    };
+
+    document.body.appendChild(iframe);
+  };
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
   };
@@ -138,8 +164,11 @@ export default function OrderDetail({ order: initialOrder }: OrderDetailProps) {
 
     setCancelling(true);
     try {
+      const token = await getClientToken();
+      const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
       const updatedOrder = await apiFetch<Order>(`/orders/${order.id}/status`, {
         method: 'PATCH',
+        headers,
         body: JSON.stringify({ status: 'CANCELLED' }),
       });
       setOrder(updatedOrder);
@@ -179,40 +208,19 @@ export default function OrderDetail({ order: initialOrder }: OrderDetailProps) {
 
   return (
     <div className="space-y-6 print:p-0 print:space-y-4">
-      {/* Bản in hóa đơn ẩn trong chế độ xem thông thường, chỉ hiển thị khi thực hiện In */}
-      <div className="hidden print:block font-sans">
-        <BillPreview order={order as any} />
-      </div>
-
-      {/* Nội dung chi tiết đơn hàng thông thường (ẩn khi in) */}
-      <div className="print:hidden space-y-6">
+      {/* Nội dung chi tiết đơn hàng thông thường */}
+      <div className="space-y-6">
         {/* Action buttons */}
         <div className="flex justify-end gap-3">
-          <Dialog open={isInvoiceOpen} onOpenChange={setIsInvoiceOpen}>
-            <DialogTrigger
-              render={
-                <Button
-                  variant="outline"
-                  className="flex items-center gap-2 border-slate-200 hover:bg-slate-100"
-                />
-              }
-            >
-              <Printer className="w-4 h-4" />
-              <span>Xem & In Hóa Đơn</span>
-            </DialogTrigger>
+          <Button
+            variant="outline"
+            onClick={handlePrint}
+            className="flex items-center gap-2 border-slate-200 hover:bg-slate-100"
+          >
+            <Printer className="w-4 h-4" />
+            <span>In Hóa Đơn</span>
+          </Button>
 
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="text-lg font-bold text-gray-900 border-b pb-2">
-                  Bản Xem Trước Hóa Đơn
-                </DialogTitle>
-              </DialogHeader>
-              <div className="pt-4">
-                <BillPreview order={order as any} />
-              </div>
-            </DialogContent>
-          </Dialog>
-          
           {order.status !== 'CANCELLED' && (
             <Button
               variant="destructive"
@@ -436,11 +444,11 @@ export default function OrderDetail({ order: initialOrder }: OrderDetailProps) {
               <CardContent className="pt-4 space-y-3 text-sm">
                 <div className="flex flex-col">
                   <span className="text-xs text-gray-400">Mã hóa đơn</span>
-                  <span className="font-bold text-gray-800 font-mono tracking-wider">{order.hoaDon.invoiceCode}</span>
+                  <span className="font-bold text-gray-800 font-mono tracking-wider">{order.hoaDon.invoiceNumber}</span>
                 </div>
                 <div className="flex flex-col">
                   <span className="text-xs text-gray-400">Ngày xuất</span>
-                  <span className="font-medium text-gray-800">{formatDate(order.hoaDon.createdAt)}</span>
+                  <span className="font-medium text-gray-800">{formatDate(order.hoaDon.printedAt)}</span>
                 </div>
               </CardContent>
             </Card>

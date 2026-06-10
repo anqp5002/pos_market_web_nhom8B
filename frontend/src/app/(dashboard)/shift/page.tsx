@@ -192,7 +192,7 @@ export default function ShiftPage() {
           <div className="flex items-center justify-between pt-4 border-t">
             <div className="flex items-center gap-2 text-sm text-gray-500">
               <ShoppingCart className="w-4 h-4" />
-              <span>{currentShift._count.donHangs} đơn hàng trong ca</span>
+              <span>{currentShift._count?.donHangs || 0} đơn hàng trong ca</span>
             </div>
             <button
               onClick={() => setShowCloseDialog(true)}

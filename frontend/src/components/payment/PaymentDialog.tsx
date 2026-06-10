@@ -13,7 +13,6 @@ import {
 import { Banknote, QrCode, ShoppingBag, CheckCircle2, Printer } from "lucide-react";
 import CashPayment from "./CashPayment";
 import QRPayment from "./QRPayment";
-import InvoiceReceipt from "@/components/invoice/InvoiceReceipt";
 import CustomerSelect from "./CustomerSelect";
 
 interface PaymentDialogProps {
@@ -68,8 +67,6 @@ export default function PaymentDialog({
         method: "POST",
         headers: authHeaders,
         body: JSON.stringify({
-          // nhanVienId và caLamViecId sẽ được BE lấy từ JWT token
-          caLamViecId: 1, // Tạm hardcode — sẽ lấy từ shift module sau
           khachHangId: customerId,
           items: items.map((item) => ({
             sanPhamId: item.id,
@@ -100,11 +97,14 @@ export default function PaymentDialog({
         throw new Error(payData.error || "Lỗi thanh toán");
       }
 
+      const dateStrForInvoice = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+      const fallbackInvoice = `HD-${dateStrForInvoice}-${String(orderId).padStart(4, '0')}`;
+
       // Thành công!
       setOrderResult({
         orderId,
         change: (amountReceived || totalPrice) - totalPrice,
-        invoiceNumber: payData.data?.invoice?.invoiceNumber || `INV-${orderId}`,
+        invoiceNumber: payData.invoice?.invoiceNumber || fallbackInvoice,
         items: [...items],
         subtotal: getSubtotal(),
         discount: getDiscountAmount(),
@@ -120,6 +120,40 @@ export default function PaymentDialog({
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handlePrint = () => {
+    if (!orderResult?.orderId) return;
+
+    const oldIframe = document.getElementById('pos-print-iframe');
+    if (oldIframe) {
+      oldIframe.remove();
+    }
+
+    const iframe = document.createElement('iframe');
+    iframe.id = 'pos-print-iframe';
+    iframe.style.position = 'absolute';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = 'none';
+    iframe.style.visibility = 'hidden';
+    
+    iframe.src = `/print/${orderResult.orderId}`;
+    
+    iframe.onload = () => {
+      setTimeout(() => {
+        try {
+          if (iframe.contentWindow) {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+          }
+        } catch (e) {
+          console.error("Lỗi in:", e);
+        }
+      }, 500);
+    };
+
+    document.body.appendChild(iframe);
   };
 
   // Reset khi đóng dialog
@@ -141,12 +175,14 @@ export default function PaymentDialog({
             <ShoppingBag className="w-5 h-5 text-blue-600" />
             Thanh toán đơn hàng
           </DialogTitle>
-          <DialogDescription>
-            {getTotalItems()} sản phẩm — Tổng:{" "}
-            <span className="font-bold text-blue-600">
-              {formatVND(totalPrice)}
-            </span>
-          </DialogDescription>
+          {!orderResult && (
+            <DialogDescription>
+              {getTotalItems()} sản phẩm — Tổng:{" "}
+              <span className="font-bold text-blue-600">
+                {formatVND(totalPrice)}
+              </span>
+            </DialogDescription>
+          )}
         </DialogHeader>
 
         {/* Nếu đã thanh toán thành công */}
@@ -178,7 +214,7 @@ export default function PaymentDialog({
             </div>
             {/* Nút In hóa đơn */}
             <button
-              onClick={() => window.print()}
+              onClick={handlePrint}
               className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-all shadow-md flex items-center justify-center gap-2"
             >
               <Printer className="w-5 h-5" />
@@ -190,22 +226,6 @@ export default function PaymentDialog({
             >
               Đóng và tiếp tục bán
             </button>
-
-            {/* Invoice Receipt ẩn — chỉ hiện khi print */}
-            <InvoiceReceipt
-              data={{
-                orderId: orderResult.orderId,
-                invoiceNumber: orderResult.invoiceNumber,
-                items: orderResult.items || [],
-                subtotal: orderResult.subtotal || 0,
-                discount: orderResult.discount || 0,
-                vat: orderResult.vat || 0,
-                total: orderResult.total || totalPrice,
-                amountReceived: orderResult.amountReceived || totalPrice,
-                change: orderResult.change || 0,
-                paymentMethod: method === "cash" ? "Tiền mặt" : "QR Code",
-              }}
-            />
           </div>
         ) : (
           <div className="space-y-5">

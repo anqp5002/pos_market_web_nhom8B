@@ -6,6 +6,7 @@ const router = Router();
 
 // === Tất cả route employee đều cần quyền Admin ===
 // authMiddleware đã được gắn ở server.ts rồi
+router.get('/roles/all', roleMiddleware('Admin'), employeeCtrl.getRoles);
 router.get('/', roleMiddleware('Admin'), employeeCtrl.getAll);
 router.get('/:id', roleMiddleware('Admin'), employeeCtrl.getById);
 router.post('/', roleMiddleware('Admin'), employeeCtrl.create);

@@ -21,10 +21,11 @@ async function getEmployees(token: string) {
 async function getRoles(token: string) {
   try {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
-    const res = await fetch(`${API_URL}/auth/roles`, {
+    const res = await fetch(`${API_URL}/employees/roles/all`, {
       headers: { Authorization: `Bearer ${token}` },
       cache: "no-store",
     });
+    if (!res.ok) throw new Error("API not ok");
     const data = await res.json();
     return data.data || [];
   } catch {
@@ -42,7 +43,8 @@ export default async function EmployeesPage() {
   const token = (session as any)?.accessToken;
 
   // Chỉ Admin mới được truy cập
-  if (role !== "Admin") {
+  const isAdmin = role === "Admin" || role === "ADMIN" || role === "Quản Trị Viên";
+  if (!isAdmin) {
     redirect("/pos");
   }
 

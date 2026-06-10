@@ -1,4 +1,4 @@
-import { apiFetch } from '@/lib/api';
+import { authFetch } from '@/lib/api';
 import OrderTable from '@/components/orders/OrderTable';
 
 interface PageProps {
@@ -15,7 +15,7 @@ interface PageProps {
 
 async function getOrders(params: { page: number; limit: number; status?: string }) {
   try {
-    return await apiFetch<{
+    return await authFetch<{
       data: any[];
       pagination: { page: number; limit: number; total: number; totalPages: number };
     }>('/orders', {

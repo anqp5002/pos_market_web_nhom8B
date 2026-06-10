@@ -77,3 +77,15 @@ export const remove = async (req: Request, res: Response) => {
     res.status(400).json({ success: false, message: err.message || 'Lỗi xóa nhân viên' });
   }
 };
+
+/**
+ * GET /api/employees/roles/all — Danh sách vai trò
+ */
+export const getRoles = async (_req: Request, res: Response) => {
+  try {
+    const roles = await employeeService.getRoles();
+    res.json({ success: true, data: roles });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: 'Lỗi server' });
+  }
+};

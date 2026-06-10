@@ -118,7 +118,9 @@ export default function OrderSuccess({
     }
   };
 
-  const invoiceCode = order.hoaDon?.invoiceNumber || `INV-${order.id.toString().padStart(6, '0')}`;
+  const fallbackDate = order.createdAt ? new Date(order.createdAt) : new Date();
+  const dateStrForInvoice = fallbackDate.toISOString().slice(0, 10).replace(/-/g, "");
+  const invoiceCode = order.hoaDon?.invoiceNumber || `HD-${dateStrForInvoice}-${String(order.id).padStart(4, '0')}`;
 
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
