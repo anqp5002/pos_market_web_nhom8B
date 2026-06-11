@@ -13,6 +13,7 @@ interface CreateProductData {
   price: number;
   stock: number;
   categoryId: number;
+  imageUrl?: string;
 }
 
 interface UpdateProductData {
@@ -21,6 +22,7 @@ interface UpdateProductData {
   price?: number;
   stock?: number;
   categoryId?: number;
+  imageUrl?: string;
 }
 
 // Lấy danh sách sản phẩm với search, filter, pagination

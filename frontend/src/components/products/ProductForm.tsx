@@ -36,6 +36,7 @@ interface Product {
   price: number;
   stock: number;
   categoryId: number;
+  imageUrl?: string | null;
 }
 
 interface ProductFormProps {
@@ -48,6 +49,7 @@ export default function ProductForm({ product, categories, onSuccess }: ProductF
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const isEdit = !!product;
 
   const {
@@ -66,6 +68,7 @@ export default function ProductForm({ product, categories, onSuccess }: ProductF
           price: product.price,
           stock: product.stock,
           categoryId: product.categoryId,
+          imageUrl: product.imageUrl || '',
         }
       : {
           barcode: '',
@@ -73,6 +76,7 @@ export default function ProductForm({ product, categories, onSuccess }: ProductF
           price: 0,
           stock: 0,
           categoryId: 0,
+          imageUrl: '',
         },
   });
 
@@ -81,23 +85,38 @@ export default function ProductForm({ product, categories, onSuccess }: ProductF
     setError('');
     try {
       const token = await getClientToken();
-      const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+      const headers: Record<string, string> = {};
+      if (token) headers.Authorization = `Bearer ${token}`;
+
+      const formData = new FormData();
+      formData.append('barcode', data.barcode);
+      formData.append('name', data.name);
+      formData.append('price', String(data.price));
+      formData.append('stock', String(data.stock));
+      formData.append('categoryId', String(data.categoryId));
+      
+      if (imageFile) {
+        formData.append('imageFile', imageFile);
+      } else if (data.imageUrl) {
+        formData.append('imageUrl', data.imageUrl);
+      }
 
       if (isEdit) {
         await apiFetch(`/products/${product.id}`, {
           method: 'PUT',
           headers,
-          body: JSON.stringify(data),
+          body: formData,
         });
       } else {
         await apiFetch('/products', {
           method: 'POST',
           headers,
-          body: JSON.stringify(data),
+          body: formData,
         });
       }
       setOpen(false);
       reset();
+      setImageFile(null);
       onSuccess();
     } catch (err: any) {
       setError(err.message || 'Có lỗi xảy ra');
@@ -107,7 +126,7 @@ export default function ProductForm({ product, categories, onSuccess }: ProductF
   };
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setError(''); } }}>
+    <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setError(''); setImageFile(null); } }}>
       <DialogTrigger
         render={
           isEdit ? (
@@ -203,7 +222,7 @@ export default function ProductForm({ product, categories, onSuccess }: ProductF
               control={control}
               render={({ field }) => (
                 <Select
-                  value={field.value ? String(field.value) : undefined}
+                  value={field.value ? String(field.value) : ""}
                   onValueChange={(val) => field.onChange(Number(val))}
                 >
                   <SelectTrigger>
@@ -223,6 +242,24 @@ export default function ProductForm({ product, categories, onSuccess }: ProductF
             />
             {errors.categoryId && (
               <p className="text-red-500 text-sm">{errors.categoryId.message}</p>
+            )}
+          </div>
+
+          {/* Image File Upload */}
+          <div className="space-y-2">
+            <Label htmlFor="imageFile">Ảnh Sản Phẩm</Label>
+            <Input
+              id="imageFile"
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  setImageFile(e.target.files[0]);
+                }
+              }}
+            />
+            {product?.imageUrl && !imageFile && (
+              <p className="text-xs text-gray-500 mt-1">Đã có ảnh (Tải lên ảnh mới để thay thế)</p>
             )}
           </div>
 

@@ -98,10 +98,38 @@ interface OrderDetailProps {
   order: Order;
 }
 
+import { Mail } from 'lucide-react';
+
 export default function OrderDetail({ order: initialOrder }: OrderDetailProps) {
   const router = useRouter();
   const [order, setOrder] = useState<Order>(initialOrder);
   const [cancelling, setCancelling] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
+
+  const handleSendEmail = async () => {
+    if (!order.khachHang?.email) {
+      alert("Khách hàng này không có email.");
+      return;
+    }
+
+    setSendingEmail(true);
+    try {
+      const token = await getClientToken();
+      const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+      const res = await apiFetch<{ message: string; previewUrl: string | false }>(`/orders/${order.id}/email`, {
+        method: 'POST',
+        headers,
+      });
+      alert(res.message);
+      if (res.previewUrl) {
+        window.open(res.previewUrl, '_blank');
+      }
+    } catch (err: any) {
+      alert(err.message || 'Lỗi khi gửi email');
+    } finally {
+      setSendingEmail(false);
+    }
+  };
 
   const handlePrint = () => {
     // Xóa iframe cũ nếu có để tránh rác DOM
@@ -139,6 +167,7 @@ export default function OrderDetail({ order: initialOrder }: OrderDetailProps) {
 
     document.body.appendChild(iframe);
   };
+  
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
   };
@@ -211,7 +240,23 @@ export default function OrderDetail({ order: initialOrder }: OrderDetailProps) {
       {/* Nội dung chi tiết đơn hàng thông thường */}
       <div className="space-y-6">
         {/* Action buttons */}
-        <div className="flex justify-end gap-3">
+        <div className="flex justify-end gap-3 flex-wrap">
+          {order.khachHang?.email && (
+            <Button
+              variant="outline"
+              onClick={handleSendEmail}
+              disabled={sendingEmail || order.status === 'CANCELLED'}
+              className="flex items-center gap-2 border-blue-200 text-blue-600 hover:bg-blue-50"
+            >
+              {sendingEmail ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Mail className="w-4 h-4" />
+              )}
+              <span>Gửi Email Hóa Đơn</span>
+            </Button>
+          )}
+
           <Button
             variant="outline"
             onClick={handlePrint}

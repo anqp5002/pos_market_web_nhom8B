@@ -1,4 +1,10 @@
+import { Metadata } from "next";
 import { authFetch } from "@/lib/api";
+
+export const metadata: Metadata = {
+  title: "Báo Cáo Thống Kê - POS Market",
+  description: "Thống kê doanh thu, đơn hàng và báo cáo hoạt động",
+};
 import SalesChart from "@/components/reports/SalesChart";
 import TopProducts from "@/components/reports/TopProducts";
 import {
@@ -10,12 +16,18 @@ import {
   AlertTriangle,
 } from "lucide-react";
 
-// Server Component — SSR (FR-24)
+// === ISR: Incremental Static Regeneration ===
+// Yêu cầu (Hạng mục #3): Áp dụng ISR để cache báo cáo trong 60 giây.
+// Lý do: Báo cáo doanh thu không cần realtime từng giây, việc cache giúp giảm tải DB 
+// và tăng tốc độ load trang cho các request liên tiếp.
+export const revalidate = 60;
+
+// Server Component
 async function getDashboardStats() {
   try {
     const res = await authFetch<{ success: boolean; data: any }>(
       "/reports/dashboard?period=today",
-      { cache: "no-store" }
+      { next: { revalidate: 60 } }
     );
     return res.data;
   } catch {
@@ -27,7 +39,7 @@ async function getSalesChartData() {
   try {
     const res = await authFetch<{ success: boolean; data: any[] }>(
       "/reports/sales-chart?days=7",
-      { cache: "no-store" }
+      { next: { revalidate: 60 } }
     );
     return res.data || [];
   } catch {
@@ -39,7 +51,7 @@ async function getTopProducts() {
   try {
     const res = await authFetch<{ success: boolean; data: any[] }>(
       "/reports/top-products?limit=10&days=30",
-      { cache: "no-store" }
+      { next: { revalidate: 60 } }
     );
     return res.data || [];
   } catch {

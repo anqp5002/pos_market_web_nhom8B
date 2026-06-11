@@ -120,8 +120,8 @@ export default function CustomerTable({
       </div>
 
       {/* Table */}
-      <div className="border rounded-lg bg-white">
-        <Table>
+      <div className="border rounded-lg bg-white overflow-x-auto">
+        <Table className="min-w-[500px]">
           <TableHeader>
             <TableRow>
               <TableHead className="w-[50px]">#</TableHead>

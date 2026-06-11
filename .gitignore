@@ -1,9 +1,24 @@
 node_modules/
 .env
-web_implementation_plan.md
+.env.local
+.env.*
+!.env.example
+
+# Guide and plan files
+huong_dan*
+huong_dan/
+*implementation_plan.md
 plan.md
+web_implementation_plan.md
+*bug_report*.md
+*walkthrough*.md
+*demo_testing*.md
+audit_report.md
+presentation_plan.md
+web_pos_status_report.md
 
 # build and development files
 /backend/dist/
 /backend/scratch/
 /backend/src/generated/
+/scratch/

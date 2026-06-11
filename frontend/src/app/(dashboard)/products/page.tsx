@@ -1,6 +1,11 @@
+import { Metadata } from 'next';
 import { authFetch } from '@/lib/api';
 import ProductTable from '@/components/products/ProductTable';
 
+export const metadata: Metadata = {
+  title: 'Quản Lý Sản Phẩm - POS Market',
+  description: 'Quản lý danh sách sản phẩm, tồn kho và giá cả',
+};
 // SSR: fetch data trên server
 async function getProducts() {
   try {

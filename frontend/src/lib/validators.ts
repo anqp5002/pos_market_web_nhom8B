@@ -19,6 +19,7 @@ export const productSchema = z.object({
   price: z.coerce.number().min(0, "Giá không hợp lệ"),
   stock: z.coerce.number().min(0, "Tồn kho không hợp lệ").optional().default(0),
   categoryId: z.coerce.number().min(1, "Vui lòng chọn danh mục"),
+  imageUrl: z.string().url("Đường dẫn ảnh không hợp lệ").optional().or(z.literal('')),
 });
 
 export type ProductFormData = z.infer<typeof productSchema>;

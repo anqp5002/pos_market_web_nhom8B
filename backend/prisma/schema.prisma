@@ -57,6 +57,7 @@ model SanPham {
   price       Float
   stock       Int              @default(0)
   categoryId  Int
+  imageUrl    String?          // Add imageUrl field
   category    DanhMuc          @relation(fields: [categoryId], references: [id])
   chiTiets    ChiTietDonHang[]
 }

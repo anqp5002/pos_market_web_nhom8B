@@ -62,7 +62,7 @@ export default function LoginPage() {
     <div className="w-full max-w-md px-4">
       {/* Logo */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4 shadow-lg shadow-blue-500/30">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4 shadow-lg shadow-blue-200">
           <svg
             className="w-8 h-8 text-white"
             fill="none"
@@ -77,17 +77,17 @@ export default function LoginPage() {
             />
           </svg>
         </div>
-        <h1 className="text-2xl font-bold text-white">POS Market</h1>
-        <p className="text-slate-400 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-gray-800">POS Market</h1>
+        <p className="text-gray-500 text-sm mt-1">
           Hệ thống bán hàng siêu thị
         </p>
       </div>
 
       {/* Login Card */}
-      <Card className="border-slate-700/50 bg-slate-800/50 backdrop-blur-xl shadow-2xl">
+      <Card className="border-gray-200 bg-white shadow-xl shadow-gray-200/50">
         <CardHeader className="space-y-1 pb-4">
-          <CardTitle className="text-xl text-white">Đăng nhập</CardTitle>
-          <CardDescription className="text-slate-400">
+          <CardTitle className="text-xl text-gray-800">Đăng nhập</CardTitle>
+          <CardDescription className="text-gray-500">
             Nhập thông tin tài khoản để truy cập hệ thống
           </CardDescription>
         </CardHeader>
@@ -95,7 +95,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Error Alert */}
             {error && (
-              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-2">
+              <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm flex items-center gap-2">
                 <svg
                   className="w-4 h-4 flex-shrink-0"
                   fill="currentColor"
@@ -113,44 +113,44 @@ export default function LoginPage() {
 
             {/* Username */}
             <div className="space-y-2">
-              <Label htmlFor="username" className="text-slate-300">
+              <Label htmlFor="username" className="text-gray-700">
                 Tên đăng nhập
               </Label>
               <Input
                 id="username"
                 type="text"
                 placeholder="admin"
-                className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20"
+                className="bg-gray-50 border-gray-200 text-gray-800 placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
                 {...register("username")}
                 disabled={isLoading}
               />
               {errors.username && (
-                <p className="text-red-400 text-xs">{errors.username.message}</p>
+                <p className="text-red-500 text-xs">{errors.username.message}</p>
               )}
             </div>
 
             {/* Password */}
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-slate-300">
+              <Label htmlFor="password" className="text-gray-700">
                 Mật khẩu
               </Label>
               <Input
                 id="password"
                 type="password"
                 placeholder="••••••"
-                className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20"
+                className="bg-gray-50 border-gray-200 text-gray-800 placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
                 {...register("password")}
                 disabled={isLoading}
               />
               {errors.password && (
-                <p className="text-red-400 text-xs">{errors.password.message}</p>
+                <p className="text-red-500 text-xs">{errors.password.message}</p>
               )}
             </div>
 
             {/* Submit */}
             <Button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium h-11 transition-all duration-200 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium h-11 transition-all duration-200 shadow-md shadow-blue-200 hover:shadow-blue-300"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -182,18 +182,18 @@ export default function LoginPage() {
             </Button>
 
             {/* Demo accounts */}
-            <div className="pt-2 border-t border-slate-700/50">
-              <p className="text-xs text-slate-500 text-center mb-2">
+            <div className="pt-3 border-t border-gray-100">
+              <p className="text-xs text-gray-400 text-center mb-2">
                 Tài khoản demo
               </p>
-              <div className="grid grid-cols-2 gap-2 text-xs text-slate-400">
-                <div className="bg-slate-700/30 rounded-lg p-2 text-center">
-                  <span className="font-medium text-blue-400">admin</span>
-                  <span className="text-slate-500"> / 123456</span>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="bg-blue-50 text-blue-700 rounded-lg p-2.5 text-center border border-blue-100">
+                  <span className="font-semibold">admin</span>
+                  <span className="text-blue-400"> / 123456</span>
                 </div>
-                <div className="bg-slate-700/30 rounded-lg p-2 text-center">
-                  <span className="font-medium text-green-400">cashier01</span>
-                  <span className="text-slate-500"> / 123456</span>
+                <div className="bg-emerald-50 text-emerald-700 rounded-lg p-2.5 text-center border border-emerald-100">
+                  <span className="font-semibold">cashier01</span>
+                  <span className="text-emerald-400"> / 123456</span>
                 </div>
               </div>
             </div>
@@ -202,7 +202,7 @@ export default function LoginPage() {
       </Card>
 
       {/* Footer */}
-      <p className="text-center text-xs text-slate-500 mt-6">
+      <p className="text-center text-xs text-gray-400 mt-6">
         POS Market © 2026 — Nhóm 8B INT1334
       </p>
     </div>

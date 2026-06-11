@@ -28,9 +28,13 @@ app.use(cors({
   origin: true,
   credentials: true,
 }));
-app.use(helmet());
+app.use(helmet({ crossOriginResourcePolicy: false })); // Allow cross-origin images
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static files (uploads)
+import path from 'path';
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Health check route (public)
 app.get('/api/health', (_req, res) => {
@@ -65,12 +69,15 @@ app.use(errorMiddleware);
 
 // Start server
 app.listen(Number(PORT), '0.0.0.0', () => {
-  // Get LAN IP dynamically
+  // Get LAN IP dynamically — ưu tiên Wi-Fi (192.168.x.x) trước VPN/VMware
   const getLanIp = () => {
     const interfaces = os.networkInterfaces();
+    let fallbackIp = 'localhost';
+
+    // Ưu tiên 1: Tìm adapter có tên Wi-Fi
     for (const devName in interfaces) {
       const iface = interfaces[devName];
-      if (iface) {
+      if (iface && devName.toLowerCase().includes('wi-fi')) {
         for (const alias of iface) {
           if (alias.family === 'IPv4' && !alias.internal) {
             return alias.address;
@@ -78,15 +85,40 @@ app.listen(Number(PORT), '0.0.0.0', () => {
         }
       }
     }
-    return 'localhost';
+
+    // Ưu tiên 2: Tìm IP 192.168.x.x (mạng nội bộ phổ biến nhất)
+    for (const devName in interfaces) {
+      const iface = interfaces[devName];
+      if (iface) {
+        for (const alias of iface) {
+          if (alias.family === 'IPv4' && !alias.internal) {
+            if (alias.address.startsWith('192.168.')) {
+              return alias.address;
+            }
+            if (fallbackIp === 'localhost') {
+              fallbackIp = alias.address;
+            }
+          }
+        }
+      }
+    }
+    return fallbackIp;
   };
   const LAN_IP = getLanIp();
 
-  console.log(`🚀 Server running on:`);
-  console.log(`   - Local: http://localhost:${PORT}`);
-  console.log(`   - LAN:   http://${LAN_IP}:${PORT}`);
-  console.log(`📋 Health check: http://${LAN_IP}:${PORT}/api/health`);
-  console.log(`🔐 Auth API: http://${LAN_IP}:${PORT}/api/auth/login`);
+  console.log('');
+  console.log('╔══════════════════════════════════════════════════╗');
+  console.log('║           🚀 POS SYSTEM - ĐANG CHẠY            ║');
+  console.log('╠══════════════════════════════════════════════════╣');
+  console.log(`║  🖥️  Máy tính:  http://localhost:${PORT}          ║`);
+  console.log(`║  📱 Điện thoại: http://${LAN_IP}:${PORT}     ║`);
+  console.log('╠══════════════════════════════════════════════════╣');
+  console.log(`║  🌐 Frontend:   http://${LAN_IP}:3000     ║`);
+  console.log(`║  ⚙️  Backend:    http://${LAN_IP}:${PORT}     ║`);
+  console.log('╚══════════════════════════════════════════════════╝');
+  console.log('');
+  console.log(`📱 Mở điện thoại → Trình duyệt → Gõ: http://${LAN_IP}:3000`);
+  console.log('');
 });
 
 export default app;

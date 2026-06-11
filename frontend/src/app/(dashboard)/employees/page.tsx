@@ -1,4 +1,10 @@
+import { Metadata } from "next";
 import { auth } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  title: "Quản Lý Nhân Viên - POS Market",
+  description: "Quản lý tài khoản nhân viên, phân quyền và bảo mật hệ thống",
+};
 import { authFetch } from "@/lib/api";
 import { redirect } from "next/navigation";
 import EmployeeTable from "@/components/employees/EmployeeTable";

@@ -1,6 +1,11 @@
+import { Metadata } from 'next';
 import { authFetch } from '@/lib/api';
 import OrderTable from '@/components/orders/OrderTable';
 
+export const metadata: Metadata = {
+  title: 'Quản Lý Đơn Hàng - POS Market',
+  description: 'Quản lý danh sách đơn hàng, xem chi tiết và trạng thái thanh toán',
+};
 interface PageProps {
   searchParams: Promise<{
     page?: string;

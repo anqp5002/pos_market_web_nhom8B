@@ -84,6 +84,37 @@ export async function updateEmployee(id: number, input: UpdateEmployeeInput) {
  * Xóa nhân viên
  */
 export async function deleteEmployee(id: number) {
+  const employee = await prisma.nhanVien.findUnique({
+    where: { id },
+    include: {
+      role: true,
+      _count: { select: { caLamViecs: true, donHangs: true } },
+    },
+  });
+
+  if (!employee) {
+    throw new Error('Nhân viên không tồn tại');
+  }
+
+  // Không cho phép xóa Admin
+  if (employee.role.name === 'Admin' || employee.role.name === 'ADMIN') {
+    throw new Error('Không thể xóa tài khoản Quản trị viên');
+  }
+
+  // Kiểm tra có đang mở ca không
+  const openShift = await prisma.caLamViec.findFirst({
+    where: { nhanVienId: id, status: 'OPEN' },
+  });
+
+  if (openShift) {
+    throw new Error('Nhân viên đang mở ca làm việc, không thể xóa. Vui lòng đóng ca trước.');
+  }
+
+  // Kiểm tra khóa ngoại (đã có giao dịch)
+  if (employee._count.caLamViecs > 0 || employee._count.donHangs > 0) {
+    throw new Error('Nhân viên này đã có dữ liệu giao dịch (ca làm việc / đơn hàng), không thể xóa');
+  }
+
   return prisma.nhanVien.delete({ where: { id } });
 }
 

@@ -4,7 +4,7 @@ import { auth } from '@/lib/auth';
  * Xác định API URL động: client-side dùng hostname (hỗ trợ LAN),
  * server-side dùng localhost (loopback tin cậy).
  */
-const getApiBase = () => {
+export const getApiBase = () => {
   if (typeof window !== 'undefined') {
     const host = window.location.hostname;
     return `http://${host}:4000/api`;
@@ -45,10 +45,13 @@ export async function apiFetch<T>(
 
   const { headers: customHeaders, ...restOptions } = fetchOptions;
 
+  const isFormData = restOptions.body instanceof FormData;
+  const defaultHeaders: Record<string, string> = isFormData ? {} : { 'Content-Type': 'application/json' };
+
   const res = await fetch(url, {
     ...restOptions,
     headers: {
-      'Content-Type': 'application/json',
+      ...defaultHeaders,
       ...customHeaders,
     },
   });

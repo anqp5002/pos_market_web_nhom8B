@@ -169,8 +169,8 @@ export default function EmployeeTable({ employees: initialEmployees, roles }: Pr
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <Table>
+      <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+        <Table className="min-w-[500px]">
           <TableHeader>
             <TableRow className="bg-gray-50">
               <TableHead className="w-16">ID</TableHead>
@@ -304,7 +304,7 @@ export default function EmployeeTable({ employees: initialEmployees, roles }: Pr
               <Select
                 value={formData.roleId}
                 onValueChange={(val) =>
-                  setFormData({ ...formData, roleId: val })
+                  setFormData({ ...formData, roleId: val || "" })
                 }
               >
                 <SelectTrigger>

@@ -157,8 +157,8 @@ export default function ProductTable({
       </div>
 
       {/* Table */}
-      <div className="border rounded-lg bg-white">
-        <Table>
+      <div className="border rounded-lg bg-white overflow-x-auto">
+        <Table className="min-w-[600px]">
           <TableHeader>
             <TableRow>
               <TableHead className="w-[50px]">#</TableHead>

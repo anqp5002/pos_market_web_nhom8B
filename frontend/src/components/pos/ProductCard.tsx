@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCartStore, type CartItem } from "@/stores/cartStore";
 import { ShoppingCart } from "lucide-react";
 
@@ -11,6 +12,7 @@ interface ProductCardProps {
     barcode: string;
     stock: number;
     category: { name: string };
+    imageUrl?: string | null;
   };
 }
 
@@ -37,9 +39,21 @@ export default function ProductCard({ product }: ProductCardProps) {
         {product.category.name}
       </span>
 
-      {/* Product icon placeholder */}
-      <div className="w-full aspect-square bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg flex items-center justify-center mb-3">
-        <span className="text-4xl">📦</span>
+
+
+      {/* Product Image or placeholder */}
+      <div className="w-full aspect-square bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg flex items-center justify-center mb-3 overflow-hidden relative">
+        {product.imageUrl ? (
+          <Image 
+            src={product.imageUrl.startsWith('/uploads') ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api'}`.replace('/api', '') + product.imageUrl : product.imageUrl} 
+            alt={product.name} 
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover mix-blend-multiply" 
+          />
+        ) : (
+          <span className="text-4xl">📦</span>
+        )}
       </div>
 
       {/* Name */}

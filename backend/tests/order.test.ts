@@ -52,6 +52,8 @@ describe('Unit Tests - Order & Payment API Core Logic', () => {
       nhanVienId: 1,
       caLamViecId: 1,
       khachHangId: 1,
+      discount: 0,
+      taxRate: 0,
       items: [{ sanPhamId: 1, quantity: 2 }],
     };
 
@@ -106,6 +108,8 @@ describe('Unit Tests - Order & Payment API Core Logic', () => {
       nhanVienId: 1,
       caLamViecId: 1,
       khachHangId: 1,
+      discount: 0,
+      taxRate: 0,
       items: [{ sanPhamId: 1, quantity: 20 }], // Asking for 20, but stock is 10
     };
 
@@ -135,6 +139,8 @@ describe('Unit Tests - Order & Payment API Core Logic', () => {
     const mockOrderInput = {
       nhanVienId: 1,
       caLamViecId: 1,
+      discount: 0,
+      taxRate: 0,
       items: [{ sanPhamId: 1, quantity: 2 }],
     };
 
@@ -190,7 +196,7 @@ describe('Unit Tests - Order & Payment API Core Logic', () => {
 
     const result = await orderService.processPayment(1, { ptttId: 1, amount: 10000 });
 
-    expect(result.change).toBe(1000); // 10000 paid - 9000 total = 1000 change
+    expect(result.change).toBe(100); // 10000 paid - 9900 total (incl. VAT) = 100 change
     expect(result.order.status).toBe('COMPLETED');
     expect(result.invoice.invoiceNumber).toBe('HD-20260521-0001');
   });
@@ -216,6 +222,6 @@ describe('Unit Tests - Order & Payment API Core Logic', () => {
 
     await expect(
       orderService.processPayment(1, { ptttId: 1, amount: 5000 }) // Paying 5000 for 9000 total
-    ).rejects.toThrow('Số tiền thanh toán không đủ (Yêu cầu: 9000 ₫, Khách trả: 5000 ₫)');
+    ).rejects.toThrow('Số tiền thanh toán không đủ (Yêu cầu: 9900 ₫, Khách trả: 5000 ₫)');
   });
 });

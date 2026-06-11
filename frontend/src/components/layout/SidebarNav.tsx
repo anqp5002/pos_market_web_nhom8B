@@ -15,20 +15,26 @@ import { cn } from "@/lib/utils";
 
 interface SidebarNavProps {
   isAdmin: boolean;
+  onItemClick?: () => void;
 }
 
-export default function SidebarNav({ isAdmin }: SidebarNavProps) {
+export default function SidebarNav({ isAdmin, onItemClick }: SidebarNavProps) {
   const pathname = usePathname();
 
-  const links = [
-    { href: "/reports", icon: BarChart3, label: "Báo cáo" },
-    { href: "/pos", icon: ShoppingCart, label: "Bán Hàng" },
-    { href: "/orders", icon: FileText, label: "Đơn Hàng" },
-    { href: "/products", icon: Package, label: "Sản Phẩm" },
-    { href: "/customers", icon: Users, label: "Khách Hàng" },
-  ];
+  // Xây dựng menu dựa trên role
+  const links = [];
 
   if (isAdmin) {
+    // Admin thấy tất cả
+    links.push({ href: "/reports", icon: BarChart3, label: "Báo cáo" });
+  }
+
+  links.push({ href: "/pos", icon: ShoppingCart, label: "Bán Hàng" });
+  links.push({ href: "/orders", icon: FileText, label: "Đơn Hàng" });
+
+  if (isAdmin) {
+    links.push({ href: "/products", icon: Package, label: "Sản Phẩm" });
+    links.push({ href: "/customers", icon: Users, label: "Khách Hàng" });
     links.push({ href: "/employees", icon: UserCog, label: "Nhân Viên" });
   }
 
@@ -42,6 +48,7 @@ export default function SidebarNav({ isAdmin }: SidebarNavProps) {
           <Link
             key={idx}
             href={link.href}
+            onClick={onItemClick}
             className={cn(
               "flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
               isActive
@@ -57,3 +64,4 @@ export default function SidebarNav({ isAdmin }: SidebarNavProps) {
     </nav>
   );
 }
+

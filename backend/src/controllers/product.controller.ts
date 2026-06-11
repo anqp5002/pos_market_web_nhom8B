@@ -52,12 +52,20 @@ export const getByBarcode = async (req: Request, res: Response) => {
 export const create = async (req: Request, res: Response) => {
   try {
     const { barcode, name, price, stock, categoryId } = req.body;
+    let finalImageUrl = req.body.imageUrl || null;
+    
+    // Nếu có file upload, dùng đường dẫn file đó
+    if (req.file) {
+      finalImageUrl = `/uploads/${req.file.filename}`;
+    }
+
     const product = await productService.create({
       barcode,
       name,
       price: Number(price),
       stock: Number(stock),
       categoryId: Number(categoryId),
+      imageUrl: finalImageUrl,
     });
     res.status(201).json(product);
   } catch (err: any) {
@@ -80,6 +88,12 @@ export const update = async (req: Request, res: Response) => {
     if (price !== undefined) data.price = Number(price);
     if (stock !== undefined) data.stock = Number(stock);
     if (categoryId !== undefined) data.categoryId = Number(categoryId);
+    
+    if (req.file) {
+      data.imageUrl = `/uploads/${req.file.filename}`;
+    } else if (req.body.imageUrl !== undefined) {
+      data.imageUrl = req.body.imageUrl || null;
+    }
 
     const product = await productService.update(Number(req.params.id), data);
     res.json(product);

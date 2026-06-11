@@ -195,8 +195,8 @@ export default function OrderTable({
       </div>
 
       {/* Table listing */}
-      <div className="border rounded-lg bg-white shadow-sm overflow-hidden">
-        <Table>
+      <div className="border rounded-lg bg-white shadow-sm overflow-x-auto">
+        <Table className="min-w-[800px]">
           <TableHeader className="bg-gray-50">
             <TableRow>
               <TableHead className="w-[80px]">Mã Đơn</TableHead>
