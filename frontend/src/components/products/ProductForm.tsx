@@ -60,7 +60,7 @@ export default function ProductForm({ product, categories, onSuccess }: ProductF
     reset,
     formState: { errors },
   } = useForm<ProductFormValues>({
-    resolver: zodResolver(productSchema),
+    resolver: zodResolver(productSchema) as any,
     defaultValues: product
       ? {
           barcode: product.barcode,

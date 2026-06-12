@@ -61,7 +61,7 @@ export default function CustomerForm({ customer, onSuccess }: CustomerFormProps)
       };
 
       const token = await getClientToken();
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
 
       if (isEdit) {
         await apiFetch(`/customers/${customer.id}`, {

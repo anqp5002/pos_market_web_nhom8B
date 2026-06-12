@@ -72,7 +72,7 @@ export default function TopProducts({ data }: TopProductsProps) {
               width={120}
             />
             <Tooltip
-              formatter={(value: number, _name: string, props: any) => [
+              formatter={(value: any, _name: any, props: any) => [
                 `${value} đã bán`,
                 props.payload.fullName,
               ]}
