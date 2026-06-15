@@ -140,8 +140,6 @@ Câu hỏi hiện tại của người dùng: "${message}"`;
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-    // Tạo contents format cho Gemini
-    // Đơn giản hóa, ta chỉ truyền prompt + message hiện tại (không cần phức tạp history lúc này)
     const contents = [
       {
         parts: [{ text: prompt }]
@@ -155,11 +153,18 @@ Câu hỏi hiện tại của người dùng: "${message}"`;
     });
 
     const data = await response.json();
+    console.log('Gemini chatWithAi response status:', response.status);
+    
+    if (!response.ok) {
+      console.error('Gemini Error:', JSON.stringify(data, null, 2));
+      return "Xin lỗi, API Key có vấn đề hoặc bị giới hạn. Vui lòng kiểm tra lại cấu hình.";
+    }
+
     const textContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     return textContent || "Xin lỗi, tôi không thể xử lý câu hỏi lúc này.";
-  } catch (error) {
-    console.error('Error in chatWithAi:', error);
-    return "Có lỗi xảy ra khi kết nối tới Trợ lý ảo. Vui lòng thử lại sau.";
+  } catch (error: any) {
+    console.error('Error in chatWithAi:', error.message);
+    return \`Có lỗi xảy ra khi kết nối tới Trợ lý ảo: \${error.message}\`;
   }
 };
