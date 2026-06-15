@@ -1,146 +1,122 @@
-# POS Market - Hệ Thống Quản Lý Bán Hàng Siêu Thị
+# 🛒 POS Market - Hệ Thống Quản Lý Bán Hàng Siêu Thị Thông Minh
 
-![Next.js](https://img.shields.io/badge/Next.js-14-black)
-![Node.js](https://img.shields.io/badge/Node.js-Express-green)
-![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-blue)
-![Prisma](https://img.shields.io/badge/ORM-Prisma-indigo)
-![TailwindCSS](https://img.shields.io/badge/Styling-TailwindCSS-38B2AC)
+<div align="center">
+  <img src="https://img.shields.io/badge/Next.js-16.2.6-black?style=for-the-badge&logo=next.js" alt="Next.js" />
+  <img src="https://img.shields.io/badge/Node.js-Express-green?style=for-the-badge&logo=node.js" alt="Node.js" />
+  <img src="https://img.shields.io/badge/PostgreSQL-Database-blue?style=for-the-badge&logo=postgresql" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Prisma-ORM-indigo?style=for-the-badge&logo=prisma" alt="Prisma" />
+  <img src="https://img.shields.io/badge/TailwindCSS-Styling-38B2AC?style=for-the-badge&logo=tailwind-css" alt="TailwindCSS" />
+  <img src="https://img.shields.io/badge/Docker-Container-2496ED?style=for-the-badge&logo=docker" alt="Docker" />
+  <img src="https://img.shields.io/badge/Gemini_2.5_Flash-AI-FF6F00?style=for-the-badge&logo=google" alt="Google Gemini AI" />
+</div>
 
-**POS Market** là một hệ thống quản lý điểm bán hàng (Point of Sale) dành cho siêu thị/cửa hàng tiện lợi, được xây dựng theo kiến trúc Client-Server hiện đại. Đây là dự án thực hành môn học **INT1334 - Lập Trình Web**.
+<br />
 
-Dự án chú trọng đến UI/UX, tốc độ phản hồi nhanh, thiết kế đáp ứng (Responsive) hỗ trợ đa thiết bị (Máy tính, Máy tính bảng, Điện thoại di động) và được xây dựng chuẩn theo các yêu cầu kỹ thuật của bài tập lớn.
+**POS Market** là một hệ thống phần mềm quản lý điểm bán hàng (Point of Sale) toàn diện, được thiết kế theo chuẩn kiến trúc Client-Server hiện đại. Dự án hướng tới việc số hóa quy trình bán lẻ cho các siêu thị và cửa hàng tiện lợi, tối ưu hóa trải nghiệm Thu ngân và Khách hàng với các công nghệ tiên tiến nhất như Trí tuệ nhân tạo (AI) và Progressive Web App (PWA).
 
----
-
-##  Tính Năng Chính
-
-Hệ thống bao gồm các Module tính năng sau:
-
-1. **Bán hàng (POS - Dành cho Thu Ngân)**
-   - Giao diện bán hàng trực quan, hỗ trợ tìm kiếm sản phẩm nhanh chóng.
-   - Thêm vào giỏ hàng, tùy chỉnh số lượng, tự động tính tổng tiền (gồm cả Thuế VAT).
-   - Thanh toán đa phương thức (Tiền mặt, Chuyển khoản, Thẻ).
-   - **Tính năng nâng cao:** Xuất hóa đơn PDF và gửi Hóa đơn điện tử qua Email cho khách hàng.
-
-2. **Quản lý Sản Phẩm & Kho Hàng**
-   - Quản lý danh mục (Categories) và Sản phẩm (Products).
-   - Kiểm soát số lượng tồn kho (Stock). Tự động cảnh báo hết hàng và không cho phép bán nếu tồn kho = 0.
-   - Quét/Tạo mã vạch (Barcode) định danh sản phẩm.
-
-3. **Quản lý Đơn Hàng & Giao Dịch**
-   - Lưu trữ toàn bộ lịch sử hóa đơn bán hàng.
-   - Xem chi tiết đơn hàng (Thời gian, Nhân viên lập, Sản phẩm mua, Khách hàng).
-   - Quản lý trạng thái: Chờ thanh toán, Hoàn thành, Đã hủy (Hủy đơn tự động hoàn kho).
-
-4. **Quản lý Khách Hàng**
-   - Lưu trữ thông tin khách thân thiết (Tên, SĐT, Email).
-   - Có thể chọn Khách lẻ (Vãng lai) hoặc Khách thành viên khi thanh toán.
-
-5. **Quản lý Ca Làm Việc (Shift)**
-   - Yêu cầu nhân viên mở ca (Open Shift) với số tiền đầu ca trước khi được phép bán hàng.
-   - Tự động thống kê doanh thu thu ngân trong ca, tiền mặt thu được, tiền mặt chênh lệch.
-   - Đóng ca (Close Shift) chốt sổ cuối ngày.
-
-6. **Phân Quyền & Bảo Mật**
-   - Xác thực bằng **JWT Token** (JSON Web Token) kết hợp mã hóa mật khẩu **Bcrypt**.
-   - 2 Role chính: `Admin` (Toàn quyền quản lý hệ thống, nhân viên) và `Cashier` (Chỉ được bán hàng và xem đơn hàng của mình).
-   - Middleware phân quyền độc lập tại Backend.
-
-7. **Báo Cáo & AI (Phụ lục)**
-   - Dashboard báo cáo doanh thu tổng quan theo ngày/tuần/tháng bằng biểu đồ (Recharts).
-   - Top sản phẩm bán chạy.
-   - Tích hợp AI cơ bản gợi ý sản phẩm bán chéo (Cross-selling).
+🎓 **Dự án Đồ án Cuối kỳ môn học: INT1334 - Lập Trình Web**  
+👨‍🏫 **Giảng viên hướng dẫn:** ThS. Lê Ngọc Hiếu  
+👥 **Thực hiện bởi:** Nhóm 8B  
 
 ---
 
-## Công Nghệ Sử Dụng
+## 🚀 Tính Năng Nổi Bật (Key Features)
 
-### Frontend
-- **Framework:** Next.js 14+ (App Router).
-- **Ngôn ngữ:** TypeScript.
-- **Styling:** Tailwind CSS, Shadcn UI, Lucide Icons.
-- **State Management:** Zustand (Quản lý giỏ hàng cục bộ).
-- **Tối ưu SEO:** Sử dụng `next/image` và ISR/SSG (`revalidate`, `metadata`).
+### 1. 🤖 Trợ Lý Ảo AI (Gemini 2.5 Flash Integration)
+- Tích hợp trực tiếp Google Gemini 2.5 Flash thông qua API.
+- Chatbot thông minh hỗ trợ giải đáp thắc mắc, hướng dẫn sử dụng phần mềm cho người dùng mới.
+- Tính năng AI gợi ý bán chéo sản phẩm (Cross-selling) tự động dựa trên giỏ hàng hiện tại để tối ưu hóa doanh thu.
 
-### Backend
-- **Runtime & Framework:** Node.js, Express.js.
-- **Ngôn ngữ:** TypeScript.
-- **Database:** PostgreSQL.
-- **ORM:** Prisma.
-- **Authentication:** JWT, Bcrypt.
-- **Tiện ích khác:** Nodemailer (Gửi Email), jsPDF (Tạo PDF Hóa đơn), Zod (Validate Payload), Jest & Supertest (Unit Test).
+### 2. 📱 Trải Nghiệm Ứng Dụng Đa Nền Tảng (PWA)
+- Hỗ trợ **Progressive Web App (PWA)**, cho phép cài đặt trực tiếp phần mềm lên màn hình chính của Điện thoại/Máy tính bảng/PC như một ứng dụng Native độc lập.
+- Giao diện Responsive hoàn toàn 100%, tự động thích ứng với thiết bị của Thu ngân.
 
----
+### 3. 💳 Chức Năng Bán Hàng (POS Core)
+- Giao diện bán hàng tốc độ cao, hỗ trợ thao tác chuột và cảm ứng mượt mà.
+- Tính toán Giỏ hàng, Thuế VAT, Tiền thối lại theo thời gian thực (Real-time).
+- Quét/Nhập mã vạch sản phẩm (Barcode).
+- Xuất hóa đơn định dạng PDF và Gửi Hóa đơn điện tử tự động qua Email cho Khách hàng.
 
-## Hướng Dẫn Cài Đặt và Chạy Dự Án
+### 4. 📦 Quản Lý Kho & Vận Hành
+- **Quản lý Sản phẩm:** Thêm, sửa, xóa, tìm kiếm, lọc theo Danh mục. Cảnh báo hết hàng tự động khi Tồn kho = 0.
+- **Quản lý Đơn hàng:** Lưu trữ lịch sử giao dịch, cho phép hoàn hủy đơn và tự động hoàn trả số lượng sản phẩm vào kho.
+- **Quản lý Ca làm việc (Shift Management):** Bắt buộc Thu ngân mở ca (chốt tiền đầu ngày) và Đóng ca (đối soát tiền mặt cuối ngày) để chống thất thoát.
 
-### Yêu Cầu Hệ Thống
-- [Node.js](https://nodejs.org/en/) (phiên bản 18+).
-- [PostgreSQL](https://www.postgresql.org/) (chạy ở port 5432) hoặc có chuỗi kết nối Database Cloud.
-
-### 1. Khởi tạo Backend
-
-1. Di chuyển vào thư mục backend:
-   ```bash
-   cd web_pos/backend
-   ```
-2. Cài đặt các thư viện:
-   ```bash
-   npm install
-   ```
-3. Cấu hình biến môi trường:
-   - Copy file `.env.example` thành `.env`.
-   - Cập nhật chuỗi kết nối PostgreSQL vào biến `DATABASE_URL`.
-4. Cập nhật Database & Seed dữ liệu mẫu:
-   ```bash
-   npx prisma generate
-   npx prisma db push
-   npm run seed
-   ```
-5. Chạy server Backend:
-   ```bash
-   npm run dev
-   ```
-   *(Server Backend sẽ khởi chạy tại: http://localhost:4000)*
-
-### 2. Khởi tạo Frontend
-
-1. Mở một Terminal khác, di chuyển vào thư mục frontend:
-   ```bash
-   cd web_pos/frontend
-   ```
-2. Cài đặt các thư viện:
-   ```bash
-   npm install
-   ```
-3. Cấu hình biến môi trường:
-   - Copy file `.env.example` thành `.env.local`.
-   - Kiểm tra `NEXT_PUBLIC_API_URL` (mặc định: http://localhost:4000/api).
-4. Chạy server Frontend:
-   ```bash
-   npm run dev
-   ```
-   *(Giao diện web sẽ khả dụng tại: http://localhost:3000)*
+### 5. 🛡️ Bảo Mật & Phân Quyền (Security)
+- Hệ thống phân quyền chặt chẽ thông qua JWT (JSON Web Tokens) và Bcrypt.
+- Gồm 2 Role chính:
+  - `Admin`: Toàn quyền quản trị hệ thống, nhân sự, xem báo cáo doanh thu tổng.
+  - `Cashier`: Bán hàng tại quầy, quản lý đơn cá nhân, giao ca.
+- Middleware bảo vệ toàn bộ API Endpoint.
 
 ---
 
-## Tài Khoản Đăng Nhập Mẫu
+## 🛠️ Kiến Trúc Công Nghệ (Tech Stack)
 
-Sau khi chạy lệnh `npm run seed` ở bước Backend, hệ thống sẽ có các tài khoản mặc định sau:
-
-- **Admin (Quản trị viên):** 
-  - Username: `admin`
-  - Password: `password123`
-- **Cashier (Thu ngân):** 
-  - Username: `cashier1`
-  - Password: `password123`
+* **Frontend:** Next.js 16 (App Router, Server Actions), React Hook Form + Zod, Zustand (State Management), Tailwind CSS, Shadcn UI, Recharts (Biểu đồ).
+* **Backend:** Node.js, Express.js, TypeScript, JWT, Bcrypt, Multer (Upload file), Nodemailer.
+* **Cơ Sở Dữ Liệu:** PostgreSQL, Prisma ORM.
+* **Cơ Sở Hạ Tầng:** Docker & Docker Compose (cho Database Local), Vercel (FE Deployment), Render (BE Deployment).
 
 ---
 
-## Nhóm Thực Hiện
+## 💻 Hướng Dẫn Cài Đặt (Quick Start)
 
-- **Nhóm:** Nhóm 8B
-- **Môn học:** Lập Trình Web (INT1334)
-- **Giảng viên hướng dẫn:** Ths. Lê Ngọc Hiếu
+Yêu cầu hệ thống: **Node.js 18+** và **Docker Desktop** (hoặc cài sẵn PostgreSQL).
 
-*Cảm ơn đã theo dõi và trải nghiệm ứng dụng của chúng em!*
+### Bước 1: Khởi động Cơ Sở Dữ Liệu bằng Docker
+Từ thư mục gốc (nơi chứa file `docker-compose.yml`), chạy lệnh:
+\`\`\`bash
+docker-compose up -d
+\`\`\`
+*(Hệ thống sẽ tự động pull image PostgreSQL và mở cổng 5432).*
+
+### Bước 2: Cài đặt và cấu hình Backend
+\`\`\`bash
+# Di chuyển vào thư mục backend
+cd backend
+
+# Cài đặt thư viện
+npm install
+
+# Cấu hình biến môi trường
+cp .env.example .env
+# (Lưu ý: Mở file .env và điền GEMINI_API_KEY nếu muốn dùng tính năng AI)
+
+# Khởi tạo Database và nạp dữ liệu mẫu
+npx prisma generate
+npx prisma db push
+npm run seed
+
+# Khởi chạy Backend Server (Port 4000)
+npm run dev
+\`\`\`
+
+### Bước 3: Cài đặt và khởi chạy Frontend
+Mở một Terminal mới:
+\`\`\`bash
+# Di chuyển vào thư mục frontend
+cd frontend
+
+# Cài đặt thư viện
+npm install
+
+# Khởi chạy Frontend Server (Port 3000)
+# (Đã config --webpack để tương thích Next.js 16 và next-pwa)
+npm run dev
+\`\`\`
+Truy cập **http://localhost:3000** để sử dụng ứng dụng.
+
+---
+
+## 🔑 Tài Khoản Truy Cập Mẫu
+Sau khi chạy lệnh `npm run seed`, hệ thống đã có sẵn dữ liệu test:
+- **Tài khoản Quản trị (Admin):** 
+  - User: `admin` | Mật khẩu: `123456`
+- **Tài khoản Thu ngân (Cashier):** 
+  - User: `cashier1` | Mật khẩu: `123456`
+
+---
+
+## 📜 Giấy Phép (License)
+Dự án được phát triển phục vụ mục đích học thuật và nghiên cứu cho môn học Lập Trình Web (INT1334). Không sử dụng cho mục đích thương mại khi chưa có sự đồng ý của nhóm tác giả.
