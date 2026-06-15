@@ -45,6 +45,37 @@ app.get('/api/health', (_req, res) => {
   });
 });
 
+import prisma from './config/db';
+
+// Public Database Fix endpoint
+app.get('/api/fix-db', async (_req, res) => {
+  try {
+    const pkCheck: any = await prisma.$queryRaw`
+      SELECT tc.constraint_name, tc.table_name
+      FROM information_schema.table_constraints tc
+      WHERE tc.constraint_type = 'PRIMARY KEY' AND tc.table_name = 'NhanVien';
+    `;
+    const uniqueCheck: any = await prisma.$queryRaw`
+      SELECT tc.constraint_name, tc.table_name
+      FROM information_schema.table_constraints tc
+      WHERE tc.constraint_type = 'UNIQUE' AND tc.table_name = 'NhanVien';
+    `;
+    
+    // Auto-fix missing PK
+    if (pkCheck.length === 0) {
+      await prisma.$queryRaw`ALTER TABLE "NhanVien" ADD PRIMARY KEY ("id");`;
+    }
+    // Auto-fix missing UNIQUE
+    if (uniqueCheck.length === 0) {
+      await prisma.$queryRaw`ALTER TABLE "NhanVien" ADD CONSTRAINT "NhanVien_username_key" UNIQUE ("username");`;
+    }
+
+    res.json({ success: true, message: "Database constraints checked and fixed!" });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // === PUBLIC Routes (không cần token) ===
 app.use('/api/auth', authRoutes);
 
