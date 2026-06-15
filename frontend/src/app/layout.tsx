@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -12,10 +12,20 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  themeColor: "#2563eb",
+};
+
 export const metadata: Metadata = {
   title: {
     template: "%s | POS Market",
     default: "POS Market - Hệ Thống Quản Lý Bán Hàng Siêu Thị & POS",
+  },
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "POS Market",
   },
   description: "POS Market - Phần mềm quản lý bán hàng, doanh thu, ca làm việc, hàng tồn kho và in hóa đơn thời gian thực tốt nhất cho cửa hàng của bạn.",
   keywords: ["POS", "phần mềm bán hàng", "quản lý siêu thị", "hóa đơn điện tử", "quản lý doanh thu", "POS Market"],

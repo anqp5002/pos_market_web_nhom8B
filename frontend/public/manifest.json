@@ -1,0 +1,22 @@
+{
+  "name": "POS Market System",
+  "short_name": "POS Market",
+  "description": "Phần mềm quản lý bán hàng siêu thị toàn diện, hỗ trợ hoạt động offline mượt mà.",
+  "start_url": "/pos",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/globe.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/globe.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
