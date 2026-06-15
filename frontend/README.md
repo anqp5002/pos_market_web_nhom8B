@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# POS Market - Frontend
 
-## Getting Started
+Đây là thư mục chứa mã nguồn Frontend của dự án **POS Market**, được xây dựng bằng [Next.js](https://nextjs.org/) phiên bản 14+ (App Router).
 
-First, run the development server:
+## 🚀 Hướng dẫn khởi chạy
+
+Đầu tiên, hãy cài đặt các thư viện phụ thuộc:
+
+```bash
+npm install
+```
+
+Sau đó, khởi chạy server ở chế độ phát triển (development):
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Mở trình duyệt và truy cập [http://localhost:3000](http://localhost:3000) để xem kết quả.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Bạn có thể bắt đầu chỉnh sửa giao diện bằng cách thay đổi các file trong thư mục `src/app`. Trang sẽ tự động tải lại khi bạn lưu file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Công nghệ sử dụng
 
-## Learn More
+- **Khung ứng dụng (Framework):** Next.js (App Router)
+- **Ngôn ngữ:** TypeScript
+- **Quản lý trạng thái (State Management):** Zustand
+- **Giao diện & Cấu trúc (UI/UX):** Tailwind CSS, Shadcn UI, Lucide Icons
+- **Gọi API:** Fetch API (kết hợp với Token JWT)
+- **PWA:** Hỗ trợ cài đặt ứng dụng web trên thiết bị di động và desktop.
 
-To learn more about Next.js, take a look at the following resources:
+## 📦 Triển khai (Deploy)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Ứng dụng Frontend này được thiết kế để triển khai dễ dàng nhất trên nền tảng [Vercel](https://vercel.com/). 
+Xem thêm tài liệu chi tiết tại [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying).
