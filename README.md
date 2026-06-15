@@ -1,139 +1,139 @@
-# POS Market - He Thong Quan Ly Ban Hang Sieu Thi Thong Minh
+# POS Market - Hệ Thống Quản Lý Bán Hàng Siêu Thị Thông Minh
 
-Do an cuoi ky mon hoc INT1334 - Lap Trinh Web
-Giang vien huong dan: ThS. Le Ngoc Hieu
-Nhom thuc hien: Nhom 8B
-
--------------------------------------------------------------------------------
-1. GIOI THIEU TONG QUAN
--------------------------------------------------------------------------------
-POS Market la mot he thong phan mem quan ly diem ban hang (Point of Sale) toan
-dien, duoc thiet ke theo kien truc Client-Server hien dai. Du an huong toi viec
-so hoa quy trinh ban le cho cac sieu thi va cua hang tien loi, giup toi uu hoa
-trai nghiem cua nhan vien thu ngan cung nhu ho tro quan ly hang hoa mot cach 
-chat che, han che that thoat thong qua viec ket hop cac cong nghe tien tien nhat
-bao gom Tri tue nhan tao (AI Chatbot) va Kien truc Ung dung Web Tien tien (PWA).
-
-Du an duoc xay dung voi muc tieu ap dung thuc te cac kien thuc da hoc trong 
-mon Lap Trinh Web vao mot bai toan thuc te cua doanh nghiep.
+Đồ án cuối kỳ môn học: INT1334 - Lập Trình Web
+Giảng viên hướng dẫn: ThS. Lê Ngọc Hiếu
+Nhóm thực hiện: Nhóm 8B
 
 -------------------------------------------------------------------------------
-2. KIEN TRUC CONG NGHE (TECH STACK)
+1. GIỚI THIỆU TỔNG QUAN
 -------------------------------------------------------------------------------
-He thong duoc xay dung dua tren kien truc Micro-services thu nhat voi su phan
-tach ro rang giua Frontend va Backend.
+POS Market là một hệ thống phần mềm quản lý điểm bán hàng (Point of Sale) toàn
+diện, được thiết kế theo kiến trúc Client-Server hiện đại. Dự án hướng tới việc
+số hóa quy trình bán lẻ cho các siêu thị và cửa hàng tiện lợi, giúp tối ưu hóa
+trải nghiệm của nhân viên thu ngân cũng như hỗ trợ quản lý hàng hóa một cách 
+chặt chẽ, hạn chế thất thoát thông qua việc kết hợp các công nghệ tiên tiến nhất
+bao gồm Trí tuệ nhân tạo (AI Chatbot) và Kiến trúc Ứng dụng Web Tiến tiến (PWA).
+
+Dự án được xây dựng với mục tiêu áp dụng thực tế các kiến thức đã học trong 
+môn Lập Trình Web vào một bài toán thực tế của doanh nghiệp.
+
+-------------------------------------------------------------------------------
+2. KIẾN TRÚC CÔNG NGHỆ (TECH STACK)
+-------------------------------------------------------------------------------
+Hệ thống được xây dựng dựa trên kiến trúc phân lớp với sự phân
+tách rõ ràng giữa Frontend và Backend.
 
 * Frontend:
   - Framework: Next.js 16 (App Router, Server Actions, Turbopack).
-  - Ngon ngu: TypeScript strict mode.
-  - State Management: Zustand (quan ly state gio hang cuc bo hieu qua).
-  - Quan ly Form & Validate: React Hook Form ket hop Zod.
-  - UI/UX Styling: Tailwind CSS va Shadcn UI.
-  - Hieu nang: Tich hop Progressive Web App (PWA) cho phep cai dat va cache offline.
+  - Ngôn ngữ: TypeScript strict mode.
+  - State Management: Zustand (quản lý state giỏ hàng cục bộ hiệu quả).
+  - Quản lý Form & Validate: React Hook Form kết hợp Zod.
+  - UI/UX Styling: Tailwind CSS và Shadcn UI.
+  - Hiệu năng: Tích hợp Progressive Web App (PWA) cho phép cài đặt và lưu cache offline.
 
 * Backend:
-  - Framework: Node.js voi Express.js.
-  - Ngon ngu: TypeScript.
+  - Framework: Node.js với Express.js.
+  - Ngôn ngữ: TypeScript.
   - ORM (Object-Relational Mapping): Prisma ORM.
-  - Co so du lieu: PostgreSQL.
-  - Bao mat (Authentication & Authorization): JSON Web Token (JWT) va Bcrypt.
-  - Tien ich thu 3: Nodemailer (gui email hoa don), Multer (upload hinh anh).
+  - Cơ sở dữ liệu: PostgreSQL.
+  - Bảo mật (Authentication & Authorization): JSON Web Token (JWT) và Bcrypt.
+  - Tiện ích thứ 3: Nodemailer (gửi email hóa đơn), Multer (upload hình ảnh).
 
-* Tri tue nhan tao (AI):
+* Trí tuệ nhân tạo (AI):
   - Model: Google Gemini 2.5 Flash API.
-  - Ung dung: Chatbot ho tro nguoi dung va He thong goi y ban cheo (Cross-selling).
+  - Ứng dụng: Chatbot hỗ trợ người dùng và Hệ thống gợi ý bán chéo (Cross-selling).
 
-* Trien khai (Deployment) & DevOps:
-  - Containerization: Docker va Docker Compose (quan ly co so du lieu).
+* Triển khai (Deployment) & DevOps:
+  - Containerization: Docker và Docker Compose (quản lý cơ sở dữ liệu).
   - Hosting Frontend: Vercel.
   - Hosting Backend: Render.
 
 -------------------------------------------------------------------------------
-3. MO TA CHUC NANG CHI TIET
+3. MÔ TẢ CHỨC NĂNG CHI TIẾT
 -------------------------------------------------------------------------------
-3.1. Chuc nang Ban hang (POS Core)
-  - Giao dien ban hang (Cashier Interface) duoc thiet ke toi uu cho toc do thao tac.
-  - Tinh toan thoi gian thuc tong tien gio hang, bao gom Thue VAT va Tien thoi lai.
-  - Cho phep quet ma vach (Barcode) de them nhanh san pham vao gio.
-  - Xuat hoa don duoi dinh dang PDF, hoac gui truc tiep Hoa don dien tu qua Email.
+3.1. Chức năng Bán hàng (POS Core)
+  - Giao diện bán hàng (Cashier Interface) được thiết kế tối ưu cho tốc độ thao tác.
+  - Tính toán thời gian thực tổng tiền giỏ hàng, bao gồm Thuế VAT và Tiền thối lại.
+  - Cho phép quét mã vạch (Barcode) để thêm nhanh sản phẩm vào giỏ.
+  - Xuất hóa đơn dưới định dạng PDF, hoặc gửi trực tiếp Hóa đơn điện tử qua Email.
 
-3.2. Quan ly Kho hang va San pham
-  - Phan loai san pham theo danh muc (Categories).
-  - Kiem soat chat che so luong ton kho (Stock Tracking).
-  - He thong tu dong phat canh bao het hang va khoa chuc nang thanh toan khi ton kho
-    cham muc 0 nham tranh tinh trang am kho.
+3.2. Quản lý Kho hàng và Sản phẩm
+  - Phân loại sản phẩm theo danh mục (Categories).
+  - Kiểm soát chặt chẽ số lượng tồn kho (Stock Tracking).
+  - Hệ thống tự động phát cảnh báo hết hàng và khóa chức năng thanh toán khi tồn kho
+    chạm mức 0 nhằm tránh tình trạng âm kho.
 
-3.3. Quan ly Ca lam viec (Shift Management)
-  - Nhan vien thu ngan bat buoc phai Mo ca (Open Shift) va xac nhan so tien ban
-    dau ca truoc khi thuc hien bat ky giao dich nao.
-  - Dong ca (Close Shift) cuoi ngay de he thong tu dong doi soat doanh thu ly
-    thuyet va tien mat thuc te thu duoc, phat hien chenh lech neu co.
+3.3. Quản lý Ca làm việc (Shift Management)
+  - Nhân viên thu ngân bắt buộc phải Mở ca (Open Shift) và xác nhận số tiền ban
+    đầu ca trước khi thực hiện bất kỳ giao dịch nào.
+  - Đóng ca (Close Shift) cuối ngày để hệ thống tự động đối soát doanh thu lý
+    thuyết và tiền mặt thực tế thu được, phát hiện chênh lệch nếu có.
 
-3.4. Tro ly ao Tri tue Nhan tao (AI Chatbot)
-  - Tich hop truc tiep API cua Google Gemini 2.5 Flash.
-  - Giai dap tu dong cac thac mac ve cach su dung phan mem.
-  - Tu dong phan tich gio hang hien tai va dua ra 3 goi y san pham mua kem
-    nham tang gia tri don hang (Cross-selling).
+3.4. Trợ lý ảo Trí tuệ Nhân tạo (AI Chatbot)
+  - Tích hợp trực tiếp API của Google Gemini 2.5 Flash.
+  - Giải đáp tự động các thắc mắc về cách sử dụng phần mềm.
+  - Tự động phân tích giỏ hàng hiện tại và đưa ra 3 gợi ý sản phẩm mua kèm
+    nhằm tăng giá trị đơn hàng (Cross-selling).
 
-3.5. Bao mat va Phan quyen
-  - Phan quyen dua tren Role-based Access Control (RBAC).
-  - Role Admin: Toan quyen quan tri nhan su, kho hang, xem thong ke doanh thu.
-  - Role Cashier: Chi co quyen ban hang, giao ca va xem lich su don hang cua ban than.
-  - Middleware bao ve xuyen suot toan bo cac API Endpoint quan trong.
+3.5. Bảo mật và Phân quyền
+  - Phân quyền dựa trên Role-based Access Control (RBAC).
+  - Role Admin: Toàn quyền quản trị nhân sự, kho hàng, xem thống kê doanh thu.
+  - Role Cashier: Chỉ có quyền bán hàng, giao ca và xem lịch sử đơn hàng của bản thân.
+  - Middleware bảo vệ xuyên suốt toàn bộ các API Endpoint quan trọng.
 
 -------------------------------------------------------------------------------
-4. HUONG DAN CAI DAT VA KHOI CHAY TAI LOCAL
+4. HƯỚNG DẪN CÀI ĐẶT VÀ KHỞI CHẠY TẠI LOCAL
 -------------------------------------------------------------------------------
-Yeu cau kien quyet: May tinh can cai dat san Node.js (phien ban 18 tro len) 
-va Docker Desktop (hoac PostgreSQL chay o cong 5432).
+Yêu cầu kiên quyết: Máy tính cần cài đặt sẵn Node.js (phiên bản 18 trở lên) 
+và Docker Desktop (hoặc PostgreSQL chạy ở cổng 5432).
 
-BUOC 1: Khoi dong Co so du lieu PostgreSQL (Thong qua Docker)
-Tu thu muc goc cua du an, thuc thi lenh:
+BƯỚC 1: Khởi động Cơ sở dữ liệu PostgreSQL (Thông qua Docker)
+Từ thư mục gốc của dự án, thực thi lệnh:
   docker-compose up -d
 
-BUOC 2: Cau hinh va khoi chay Backend
+BƯỚC 2: Cấu hình và khởi chạy Backend
   cd backend
   npm install
 
-  - Sao chep noi dung tu file .env.example (o thu muc goc) vao file .env trong backend.
-  - Dam bao cac key JWT_SECRET va GEMINI_API_KEY da duoc dien day du.
+  - Sao chép nội dung từ file .env.example (ở thư mục gốc) vào file .env trong backend.
+  - Đảm bảo các key JWT_SECRET và GEMINI_API_KEY đã được điền đầy đủ.
 
-  - Thiet lap co so du lieu va nap du lieu mau (Seed Data):
+  - Thiết lập cơ sở dữ liệu và nạp dữ liệu mẫu (Seed Data):
     npx prisma generate
     npx prisma db push
     npm run seed
 
-  - Khoi chay Server:
+  - Khởi chạy Server:
     npm run dev
-    (Server backend se hoat dong tai: http://localhost:4000)
+    (Server backend sẽ hoạt động tại: http://localhost:4000)
 
-BUOC 3: Cau hinh va khoi chay Frontend
-  Mo mot cua so Terminal khac:
+BƯỚC 3: Cấu hình và khởi chạy Frontend
+  Mở một cửa sổ Terminal khác:
   cd frontend
   npm install
 
-  - Tao file .env.local trong thu muc frontend va dien NEXT_PUBLIC_API_URL.
-  - Khoi chay Server Frontend:
+  - Tạo file .env.local trong thư mục frontend và điền NEXT_PUBLIC_API_URL.
+  - Khởi chạy Server Frontend:
     npm run dev
-    (Giao dien website se hoat dong tai: http://localhost:3000)
+    (Giao diện website sẽ hoạt động tại: http://localhost:3000)
 
 -------------------------------------------------------------------------------
-5. TAI KHOAN KIEM THU (TESTING ACCOUNTS)
+5. TÀI KHOẢN KIỂM THỬ (TESTING ACCOUNTS)
 -------------------------------------------------------------------------------
-He thong da duoc nap san cac tai khoan duoi day sau khi chay lenh seed:
+Hệ thống đã được nạp sẵn các tài khoản dưới đây sau khi chạy lệnh seed:
 
-- Tai khoan Quan tri (Admin):
+- Tài khoản Quản trị (Admin):
   Username: admin
   Password: password123
 
-- Tai khoan Thu ngan (Cashier):
+- Tài khoản Thu ngân (Cashier):
   Username: cashier1
   Password: password123
 
 -------------------------------------------------------------------------------
-6. GIAY PHEP SU DUNG (LICENSE)
+6. GIẤY PHÉP SỬ DỤNG (LICENSE)
 -------------------------------------------------------------------------------
-Ma nguon nay duoc phat trien hoan toan vi muc dich hoc thuat va nghien cuu 
-de dap ung cac yeu cau cua mon hoc Lap trinh Web (INT1334).
-Nghiem cam su dung du an nay cho bat ky muc dich thuong mai nao khi chua co 
-su dong y bang van ban tu nhom tac gia.
+Mã nguồn này được phát triển hoàn toàn vì mục đích học thuật và nghiên cứu 
+để đáp ứng các yêu cầu của môn học Lập trình Web (INT1334).
+Nghiêm cấm sử dụng dự án này cho bất kỳ mục đích thương mại nào khi chưa có 
+sự đồng ý bằng văn bản từ nhóm tác giả.
