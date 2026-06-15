@@ -11,11 +11,7 @@ interface PageProps {
     page?: string;
     limit?: string;
     status?: string;
-  }> | {
-    page?: string;
-    limit?: string;
-    status?: string;
-  };
+  }>;
 }
 
 async function getOrders(params: { page: number; limit: number; status?: string }) {

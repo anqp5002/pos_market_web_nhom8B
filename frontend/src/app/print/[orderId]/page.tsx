@@ -2,7 +2,7 @@ import { authFetch } from '@/lib/api';
 import { notFound } from 'next/navigation';
 
 interface PageProps {
-  params: Promise<{ orderId: string }> | { orderId: string };
+  params: Promise<{ orderId: string }>;
 }
 
 async function getOrder(id: string) {
