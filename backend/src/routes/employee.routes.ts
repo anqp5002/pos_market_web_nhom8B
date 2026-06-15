@@ -4,15 +4,6 @@ import { roleMiddleware } from '../middleware/auth.middleware';
 
 const router = Router();
 
-// === Tất cả route employee đều cần quyền Admin ===
-// authMiddleware đã được gắn ở server.ts rồi
-router.get('/roles/all', roleMiddleware('Admin'), employeeCtrl.getRoles);
-router.get('/', roleMiddleware('Admin'), employeeCtrl.getAll);
-router.get('/:id', roleMiddleware('Admin'), employeeCtrl.getById);
-router.post('/', roleMiddleware('Admin'), employeeCtrl.create);
-router.put('/:id', roleMiddleware('Admin'), employeeCtrl.update);
-router.delete('/:id', roleMiddleware('Admin'), employeeCtrl.remove);
-
 import prisma from '../config/db';
 
 router.get('/debug-db', async (req, res) => {
@@ -42,5 +33,17 @@ router.get('/debug-db', async (req, res) => {
     res.status(500).json({ error: err.message, stack: err.stack });
   }
 });
+
+// === Cả Admin + Cashier đều được xem ===
+// (không có route nào)
+
+// === Tất cả route employee đều cần quyền Admin ===
+// authMiddleware đã được gắn ở server.ts rồi
+router.get('/roles/all', roleMiddleware('Admin'), employeeCtrl.getRoles);
+router.get('/', roleMiddleware('Admin'), employeeCtrl.getAll);
+router.get('/:id', roleMiddleware('Admin'), employeeCtrl.getById);
+router.post('/', roleMiddleware('Admin'), employeeCtrl.create);
+router.put('/:id', roleMiddleware('Admin'), employeeCtrl.update);
+router.delete('/:id', roleMiddleware('Admin'), employeeCtrl.remove);
 
 export default router;

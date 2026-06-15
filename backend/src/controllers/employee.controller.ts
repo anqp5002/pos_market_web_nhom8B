@@ -11,7 +11,7 @@ export const getAll = async (_req: Request, res: Response) => {
     const safeData = employees.map(({ password, ...rest }) => rest);
     res.json({ success: true, data: safeData });
   } catch (err: any) {
-    res.status(500).json({ success: false, message: err.message || 'Lỗi server', details: err.stack });
+    res.status(500).json({ success: false, message: err.message || 'Lỗi server', code: err.code, meta: err.meta, details: err.stack });
   }
 };
 
