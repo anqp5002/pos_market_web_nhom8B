@@ -7,6 +7,7 @@ import StockAlert from "@/components/layout/StockAlert";
 import SidebarNav from "@/components/layout/SidebarNav";
 import LogoutButton from "@/components/layout/LogoutButton";
 import MobileSidebar from "@/components/layout/MobileSidebar";
+import AiChatbot from "@/components/chat/AiChatbot";
 
 export default async function DashboardLayout({
   children,
@@ -56,6 +57,7 @@ export default async function DashboardLayout({
         <div className="flex-1 overflow-auto p-4 md:p-6 print:p-0 print:overflow-visible">
           {children}
         </div>
+        <AiChatbot />
         <StockAlert />
       </main>
     </div>

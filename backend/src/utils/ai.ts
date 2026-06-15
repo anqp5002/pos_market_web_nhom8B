@@ -114,3 +114,52 @@ const getMockSuggestions = (cartItems: { name: string }[]) => {
 
   return { suggestions: suggestions.slice(0, 3) };
 };
+
+export const chatWithAi = async (message: string, history: any[] = []) => {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    return "Hệ thống chưa được cấu hình API Key. Vui lòng liên hệ Admin.";
+  }
+
+  try {
+    const prompt = `Bạn là một trợ lý ảo thông minh tên là "POS Market Bot" chuyên hỗ trợ người dùng phần mềm POS Market (Hệ thống quản lý siêu thị mini).
+Phần mềm POS Market có các chức năng chính:
+- Trang POS (/pos): Bán hàng tại quầy, thêm sản phẩm vào giỏ, thanh toán, in hóa đơn.
+- Quản lý Sản phẩm (/products): Thêm, sửa, xóa sản phẩm, theo dõi tồn kho.
+- Quản lý Đơn hàng (/orders): Xem lịch sử đơn hàng, chi tiết đơn.
+- Quản lý Khách hàng (/customers) và Nhân viên (/employees).
+- Báo cáo thống kê (/reports): Xem doanh thu, biểu đồ, top sản phẩm bán chạy.
+- Giao ca (/shift): Mở ca làm việc trước khi bán hàng, đóng ca, đối soát tiền mặt.
+
+Nhiệm vụ của bạn:
+- Hãy trả lời câu hỏi của người dùng một cách thân thiện, ngắn gọn và dễ hiểu bằng tiếng Việt.
+- Nếu câu hỏi liên quan đến cách sử dụng phần mềm, hãy hướng dẫn họ đến đúng chức năng (ví dụ: "Bạn có thể vào mục Quản lý Đơn hàng ở thanh menu bên trái để xem...").
+- Nếu câu hỏi không liên quan đến hệ thống POS hoặc bán hàng, hãy từ chối khéo léo.
+
+Câu hỏi hiện tại của người dùng: "${message}"`;
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+    // Tạo contents format cho Gemini
+    // Đơn giản hóa, ta chỉ truyền prompt + message hiện tại (không cần phức tạp history lúc này)
+    const contents = [
+      {
+        parts: [{ text: prompt }]
+      }
+    ];
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents }),
+    });
+
+    const data = await response.json();
+    const textContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    return textContent || "Xin lỗi, tôi không thể xử lý câu hỏi lúc này.";
+  } catch (error) {
+    console.error('Error in chatWithAi:', error);
+    return "Có lỗi xảy ra khi kết nối tới Trợ lý ảo. Vui lòng thử lại sau.";
+  }
+};

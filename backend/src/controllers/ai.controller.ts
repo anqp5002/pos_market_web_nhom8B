@@ -17,3 +17,20 @@ export const getSuggestions = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Lỗi lấy gợi ý từ AI' });
   }
 };
+
+// POST /api/ai/chat
+export const getChatbotResponse = async (req: Request, res: Response) => {
+  try {
+    const { message } = req.body;
+    if (!message || typeof message !== 'string') {
+      res.status(400).json({ error: 'message phải là một chuỗi văn bản' });
+      return;
+    }
+
+    const response = await aiUtil.chatWithAi(message);
+    res.json({ reply: response });
+  } catch (err: any) {
+    console.error('Error in AI chat controller:', err);
+    res.status(500).json({ error: 'Lỗi xử lý câu hỏi từ AI' });
+  }
+};
