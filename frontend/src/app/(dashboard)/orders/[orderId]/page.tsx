@@ -9,9 +9,7 @@ import { Button } from '@/components/ui/button';
 interface PageProps {
   params: Promise<{
     orderId: string;
-  }> | {
-    orderId: string;
-  };
+  }>;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
