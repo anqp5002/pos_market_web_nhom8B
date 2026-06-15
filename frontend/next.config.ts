@@ -19,7 +19,6 @@ const nextConfig: NextConfig = {
     serverActions: {
       allowedOrigins: ["192.168.1.55:3000", "192.168.8.3:3000", "26.185.168.56:3000", "localhost:3000"],
     },
-    turbopack: {},
   },
   images: {
     remotePatterns: [
