@@ -5,11 +5,18 @@ import { auth } from '@/lib/auth';
  * server-side dùng localhost (loopback tin cậy).
  */
 export const getApiBase = () => {
+  // Production (Vercel): Luôn dùng biến môi trường đã cấu hình trên Dashboard
+  if (process.env.NODE_ENV === 'production') {
+    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+  }
+
+  // Development Client-side (Trình duyệt/Điện thoại): Lấy IP động để hỗ trợ test qua mạng LAN
   if (typeof window !== 'undefined') {
     const host = window.location.hostname;
     return `http://${host}:4000/api`;
   }
-  // Server-side: Always use localhost for absolute reliability on the host machine
+  
+  // Development Server-side: Luôn dùng localhost để đảm bảo độ ổn định
   return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 };
 
