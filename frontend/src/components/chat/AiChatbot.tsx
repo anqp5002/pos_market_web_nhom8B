@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Send, Bot, User, Loader2 } from "lucide-react";
-import { authFetch } from "@/lib/api";
+import { apiFetch, getClientToken } from "@/lib/api";
 
 type Message = {
   id: string;
@@ -48,9 +48,13 @@ export default function AiChatbot() {
     setIsLoading(true);
 
     try {
-      const res = await authFetch<{ reply: string }>("/ai/chat", {
+      const token = await getClientToken();
+      const res = await apiFetch<{ reply: string }>("/ai/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ message: userMessage.content }),
       });
 
