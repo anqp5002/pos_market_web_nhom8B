@@ -1,122 +1,139 @@
-# 🛒 POS Market - Hệ Thống Quản Lý Bán Hàng Siêu Thị Thông Minh
+# POS Market - He Thong Quan Ly Ban Hang Sieu Thi Thong Minh
 
-<div align="center">
-  <img src="https://img.shields.io/badge/Next.js-16.2.6-black?style=for-the-badge&logo=next.js" alt="Next.js" />
-  <img src="https://img.shields.io/badge/Node.js-Express-green?style=for-the-badge&logo=node.js" alt="Node.js" />
-  <img src="https://img.shields.io/badge/PostgreSQL-Database-blue?style=for-the-badge&logo=postgresql" alt="PostgreSQL" />
-  <img src="https://img.shields.io/badge/Prisma-ORM-indigo?style=for-the-badge&logo=prisma" alt="Prisma" />
-  <img src="https://img.shields.io/badge/TailwindCSS-Styling-38B2AC?style=for-the-badge&logo=tailwind-css" alt="TailwindCSS" />
-  <img src="https://img.shields.io/badge/Docker-Container-2496ED?style=for-the-badge&logo=docker" alt="Docker" />
-  <img src="https://img.shields.io/badge/Gemini_2.5_Flash-AI-FF6F00?style=for-the-badge&logo=google" alt="Google Gemini AI" />
-</div>
+Do an cuoi ky mon hoc INT1334 - Lap Trinh Web
+Giang vien huong dan: ThS. Le Ngoc Hieu
+Nhom thuc hien: Nhom 8B
 
-<br />
+-------------------------------------------------------------------------------
+1. GIOI THIEU TONG QUAN
+-------------------------------------------------------------------------------
+POS Market la mot he thong phan mem quan ly diem ban hang (Point of Sale) toan
+dien, duoc thiet ke theo kien truc Client-Server hien dai. Du an huong toi viec
+so hoa quy trinh ban le cho cac sieu thi va cua hang tien loi, giup toi uu hoa
+trai nghiem cua nhan vien thu ngan cung nhu ho tro quan ly hang hoa mot cach 
+chat che, han che that thoat thong qua viec ket hop cac cong nghe tien tien nhat
+bao gom Tri tue nhan tao (AI Chatbot) va Kien truc Ung dung Web Tien tien (PWA).
 
-**POS Market** là một hệ thống phần mềm quản lý điểm bán hàng (Point of Sale) toàn diện, được thiết kế theo chuẩn kiến trúc Client-Server hiện đại. Dự án hướng tới việc số hóa quy trình bán lẻ cho các siêu thị và cửa hàng tiện lợi, tối ưu hóa trải nghiệm Thu ngân và Khách hàng với các công nghệ tiên tiến nhất như Trí tuệ nhân tạo (AI) và Progressive Web App (PWA).
+Du an duoc xay dung voi muc tieu ap dung thuc te cac kien thuc da hoc trong 
+mon Lap Trinh Web vao mot bai toan thuc te cua doanh nghiep.
 
-🎓 **Dự án Đồ án Cuối kỳ môn học: INT1334 - Lập Trình Web**  
-👨‍🏫 **Giảng viên hướng dẫn:** ThS. Lê Ngọc Hiếu  
-👥 **Thực hiện bởi:** Nhóm 8B  
+-------------------------------------------------------------------------------
+2. KIEN TRUC CONG NGHE (TECH STACK)
+-------------------------------------------------------------------------------
+He thong duoc xay dung dua tren kien truc Micro-services thu nhat voi su phan
+tach ro rang giua Frontend va Backend.
 
----
+* Frontend:
+  - Framework: Next.js 16 (App Router, Server Actions, Turbopack).
+  - Ngon ngu: TypeScript strict mode.
+  - State Management: Zustand (quan ly state gio hang cuc bo hieu qua).
+  - Quan ly Form & Validate: React Hook Form ket hop Zod.
+  - UI/UX Styling: Tailwind CSS va Shadcn UI.
+  - Hieu nang: Tich hop Progressive Web App (PWA) cho phep cai dat va cache offline.
 
-## 🚀 Tính Năng Nổi Bật (Key Features)
+* Backend:
+  - Framework: Node.js voi Express.js.
+  - Ngon ngu: TypeScript.
+  - ORM (Object-Relational Mapping): Prisma ORM.
+  - Co so du lieu: PostgreSQL.
+  - Bao mat (Authentication & Authorization): JSON Web Token (JWT) va Bcrypt.
+  - Tien ich thu 3: Nodemailer (gui email hoa don), Multer (upload hinh anh).
 
-### 1. 🤖 Trợ Lý Ảo AI (Gemini 2.5 Flash Integration)
-- Tích hợp trực tiếp Google Gemini 2.5 Flash thông qua API.
-- Chatbot thông minh hỗ trợ giải đáp thắc mắc, hướng dẫn sử dụng phần mềm cho người dùng mới.
-- Tính năng AI gợi ý bán chéo sản phẩm (Cross-selling) tự động dựa trên giỏ hàng hiện tại để tối ưu hóa doanh thu.
+* Tri tue nhan tao (AI):
+  - Model: Google Gemini 2.5 Flash API.
+  - Ung dung: Chatbot ho tro nguoi dung va He thong goi y ban cheo (Cross-selling).
 
-### 2. 📱 Trải Nghiệm Ứng Dụng Đa Nền Tảng (PWA)
-- Hỗ trợ **Progressive Web App (PWA)**, cho phép cài đặt trực tiếp phần mềm lên màn hình chính của Điện thoại/Máy tính bảng/PC như một ứng dụng Native độc lập.
-- Giao diện Responsive hoàn toàn 100%, tự động thích ứng với thiết bị của Thu ngân.
+* Trien khai (Deployment) & DevOps:
+  - Containerization: Docker va Docker Compose (quan ly co so du lieu).
+  - Hosting Frontend: Vercel.
+  - Hosting Backend: Render.
 
-### 3. 💳 Chức Năng Bán Hàng (POS Core)
-- Giao diện bán hàng tốc độ cao, hỗ trợ thao tác chuột và cảm ứng mượt mà.
-- Tính toán Giỏ hàng, Thuế VAT, Tiền thối lại theo thời gian thực (Real-time).
-- Quét/Nhập mã vạch sản phẩm (Barcode).
-- Xuất hóa đơn định dạng PDF và Gửi Hóa đơn điện tử tự động qua Email cho Khách hàng.
+-------------------------------------------------------------------------------
+3. MO TA CHUC NANG CHI TIET
+-------------------------------------------------------------------------------
+3.1. Chuc nang Ban hang (POS Core)
+  - Giao dien ban hang (Cashier Interface) duoc thiet ke toi uu cho toc do thao tac.
+  - Tinh toan thoi gian thuc tong tien gio hang, bao gom Thue VAT va Tien thoi lai.
+  - Cho phep quet ma vach (Barcode) de them nhanh san pham vao gio.
+  - Xuat hoa don duoi dinh dang PDF, hoac gui truc tiep Hoa don dien tu qua Email.
 
-### 4. 📦 Quản Lý Kho & Vận Hành
-- **Quản lý Sản phẩm:** Thêm, sửa, xóa, tìm kiếm, lọc theo Danh mục. Cảnh báo hết hàng tự động khi Tồn kho = 0.
-- **Quản lý Đơn hàng:** Lưu trữ lịch sử giao dịch, cho phép hoàn hủy đơn và tự động hoàn trả số lượng sản phẩm vào kho.
-- **Quản lý Ca làm việc (Shift Management):** Bắt buộc Thu ngân mở ca (chốt tiền đầu ngày) và Đóng ca (đối soát tiền mặt cuối ngày) để chống thất thoát.
+3.2. Quan ly Kho hang va San pham
+  - Phan loai san pham theo danh muc (Categories).
+  - Kiem soat chat che so luong ton kho (Stock Tracking).
+  - He thong tu dong phat canh bao het hang va khoa chuc nang thanh toan khi ton kho
+    cham muc 0 nham tranh tinh trang am kho.
 
-### 5. 🛡️ Bảo Mật & Phân Quyền (Security)
-- Hệ thống phân quyền chặt chẽ thông qua JWT (JSON Web Tokens) và Bcrypt.
-- Gồm 2 Role chính:
-  - `Admin`: Toàn quyền quản trị hệ thống, nhân sự, xem báo cáo doanh thu tổng.
-  - `Cashier`: Bán hàng tại quầy, quản lý đơn cá nhân, giao ca.
-- Middleware bảo vệ toàn bộ API Endpoint.
+3.3. Quan ly Ca lam viec (Shift Management)
+  - Nhan vien thu ngan bat buoc phai Mo ca (Open Shift) va xac nhan so tien ban
+    dau ca truoc khi thuc hien bat ky giao dich nao.
+  - Dong ca (Close Shift) cuoi ngay de he thong tu dong doi soat doanh thu ly
+    thuyet va tien mat thuc te thu duoc, phat hien chenh lech neu co.
 
----
+3.4. Tro ly ao Tri tue Nhan tao (AI Chatbot)
+  - Tich hop truc tiep API cua Google Gemini 2.5 Flash.
+  - Giai dap tu dong cac thac mac ve cach su dung phan mem.
+  - Tu dong phan tich gio hang hien tai va dua ra 3 goi y san pham mua kem
+    nham tang gia tri don hang (Cross-selling).
 
-## 🛠️ Kiến Trúc Công Nghệ (Tech Stack)
+3.5. Bao mat va Phan quyen
+  - Phan quyen dua tren Role-based Access Control (RBAC).
+  - Role Admin: Toan quyen quan tri nhan su, kho hang, xem thong ke doanh thu.
+  - Role Cashier: Chi co quyen ban hang, giao ca va xem lich su don hang cua ban than.
+  - Middleware bao ve xuyen suot toan bo cac API Endpoint quan trong.
 
-* **Frontend:** Next.js 16 (App Router, Server Actions), React Hook Form + Zod, Zustand (State Management), Tailwind CSS, Shadcn UI, Recharts (Biểu đồ).
-* **Backend:** Node.js, Express.js, TypeScript, JWT, Bcrypt, Multer (Upload file), Nodemailer.
-* **Cơ Sở Dữ Liệu:** PostgreSQL, Prisma ORM.
-* **Cơ Sở Hạ Tầng:** Docker & Docker Compose (cho Database Local), Vercel (FE Deployment), Render (BE Deployment).
+-------------------------------------------------------------------------------
+4. HUONG DAN CAI DAT VA KHOI CHAY TAI LOCAL
+-------------------------------------------------------------------------------
+Yeu cau kien quyet: May tinh can cai dat san Node.js (phien ban 18 tro len) 
+va Docker Desktop (hoac PostgreSQL chay o cong 5432).
 
----
+BUOC 1: Khoi dong Co so du lieu PostgreSQL (Thong qua Docker)
+Tu thu muc goc cua du an, thuc thi lenh:
+  docker-compose up -d
 
-## 💻 Hướng Dẫn Cài Đặt (Quick Start)
+BUOC 2: Cau hinh va khoi chay Backend
+  cd backend
+  npm install
 
-Yêu cầu hệ thống: **Node.js 18+** và **Docker Desktop** (hoặc cài sẵn PostgreSQL).
+  - Sao chep noi dung tu file .env.example (o thu muc goc) vao file .env trong backend.
+  - Dam bao cac key JWT_SECRET va GEMINI_API_KEY da duoc dien day du.
 
-### Bước 1: Khởi động Cơ Sở Dữ Liệu bằng Docker
-Từ thư mục gốc (nơi chứa file `docker-compose.yml`), chạy lệnh:
-\`\`\`bash
-docker-compose up -d
-\`\`\`
-*(Hệ thống sẽ tự động pull image PostgreSQL và mở cổng 5432).*
+  - Thiet lap co so du lieu va nap du lieu mau (Seed Data):
+    npx prisma generate
+    npx prisma db push
+    npm run seed
 
-### Bước 2: Cài đặt và cấu hình Backend
-\`\`\`bash
-# Di chuyển vào thư mục backend
-cd backend
+  - Khoi chay Server:
+    npm run dev
+    (Server backend se hoat dong tai: http://localhost:4000)
 
-# Cài đặt thư viện
-npm install
+BUOC 3: Cau hinh va khoi chay Frontend
+  Mo mot cua so Terminal khac:
+  cd frontend
+  npm install
 
-# Cấu hình biến môi trường
-cp .env.example .env
-# (Lưu ý: Mở file .env và điền GEMINI_API_KEY nếu muốn dùng tính năng AI)
+  - Tao file .env.local trong thu muc frontend va dien NEXT_PUBLIC_API_URL.
+  - Khoi chay Server Frontend:
+    npm run dev
+    (Giao dien website se hoat dong tai: http://localhost:3000)
 
-# Khởi tạo Database và nạp dữ liệu mẫu
-npx prisma generate
-npx prisma db push
-npm run seed
+-------------------------------------------------------------------------------
+5. TAI KHOAN KIEM THU (TESTING ACCOUNTS)
+-------------------------------------------------------------------------------
+He thong da duoc nap san cac tai khoan duoi day sau khi chay lenh seed:
 
-# Khởi chạy Backend Server (Port 4000)
-npm run dev
-\`\`\`
+- Tai khoan Quan tri (Admin):
+  Username: admin
+  Password: password123
 
-### Bước 3: Cài đặt và khởi chạy Frontend
-Mở một Terminal mới:
-\`\`\`bash
-# Di chuyển vào thư mục frontend
-cd frontend
+- Tai khoan Thu ngan (Cashier):
+  Username: cashier1
+  Password: password123
 
-# Cài đặt thư viện
-npm install
-
-# Khởi chạy Frontend Server (Port 3000)
-# (Đã config --webpack để tương thích Next.js 16 và next-pwa)
-npm run dev
-\`\`\`
-Truy cập **http://localhost:3000** để sử dụng ứng dụng.
-
----
-
-## 🔑 Tài Khoản Truy Cập Mẫu
-Sau khi chạy lệnh `npm run seed`, hệ thống đã có sẵn dữ liệu test:
-- **Tài khoản Quản trị (Admin):** 
-  - User: `admin` | Mật khẩu: `123456`
-- **Tài khoản Thu ngân (Cashier):** 
-  - User: `cashier1` | Mật khẩu: `123456`
-
----
-
-## 📜 Giấy Phép (License)
-Dự án được phát triển phục vụ mục đích học thuật và nghiên cứu cho môn học Lập Trình Web (INT1334). Không sử dụng cho mục đích thương mại khi chưa có sự đồng ý của nhóm tác giả.
+-------------------------------------------------------------------------------
+6. GIAY PHEP SU DUNG (LICENSE)
+-------------------------------------------------------------------------------
+Ma nguon nay duoc phat trien hoan toan vi muc dich hoc thuat va nghien cuu 
+de dap ung cac yeu cau cua mon hoc Lap trinh Web (INT1334).
+Nghiem cam su dung du an nay cho bat ky muc dich thuong mai nao khi chua co 
+su dong y bang van ban tu nhom tac gia.
