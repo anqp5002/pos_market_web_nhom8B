@@ -165,6 +165,6 @@ Câu hỏi hiện tại của người dùng: "${message}"`;
     return textContent || "Xin lỗi, tôi không thể xử lý câu hỏi lúc này.";
   } catch (error: any) {
     console.error('Error in chatWithAi:', error.message);
-    return \`Có lỗi xảy ra khi kết nối tới Trợ lý ảo: \${error.message}\`;
+    return `Có lỗi xảy ra khi kết nối tới Trợ lý ảo: ${error.message}`;
   }
 };
