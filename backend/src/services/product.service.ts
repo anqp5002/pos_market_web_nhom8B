@@ -72,7 +72,7 @@ export const findById = (id: number) =>
 
 // Tìm sản phẩm theo barcode (FR-07, FR-09)
 export const findByBarcode = (barcode: string) =>
-  prisma.sanPham.findUnique({
+  prisma.sanPham.findFirst({
     where: { barcode },
     include: { category: true },
   });

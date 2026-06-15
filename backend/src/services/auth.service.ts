@@ -26,7 +26,7 @@ export class AuthService {
     const { username, password } = input;
 
     // Tìm nhân viên theo username, include role
-    const nhanVien = await prisma.nhanVien.findUnique({
+    const nhanVien = await prisma.nhanVien.findFirst({
       where: { username },
       include: { role: true },
     });

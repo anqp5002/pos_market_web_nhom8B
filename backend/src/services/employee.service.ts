@@ -42,7 +42,7 @@ export async function createEmployee(input: CreateEmployeeInput) {
   const { username, password, fullName, roleId } = input;
 
   // Kiểm tra username trùng
-  const existing = await prisma.nhanVien.findUnique({ where: { username } });
+  const existing = await prisma.nhanVien.findFirst({ where: { username } });
   if (existing) {
     throw new Error('Tên đăng nhập đã tồn tại');
   }

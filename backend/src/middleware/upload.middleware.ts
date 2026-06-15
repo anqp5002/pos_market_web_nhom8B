@@ -1,11 +1,17 @@
 import multer from 'multer';
 import path from 'path';
 
+import fs from 'fs';
+
 // Cấu hình nơi lưu trữ file
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    // Lưu vào thư mục uploads ở root backend
-    cb(null, path.join(__dirname, '../../uploads'));
+    const uploadPath = path.join(__dirname, '../../uploads');
+    // Đảm bảo thư mục uploads tồn tại trên server (Vercel/Render)
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
     // Đổi tên file để tránh trùng lặp

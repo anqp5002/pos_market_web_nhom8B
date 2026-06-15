@@ -58,7 +58,7 @@ export const findById = (id: number) =>
 
 // Tìm khách hàng theo SĐT (dùng trong POS)
 export const findByPhone = (phone: string) =>
-  prisma.khachHang.findUnique({ where: { phone } });
+  prisma.khachHang.findFirst({ where: { phone } });
 
 // Tạo khách hàng mới
 export const create = (data: CreateCustomerData) =>
