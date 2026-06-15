@@ -70,13 +70,13 @@ export default function AiChatbot() {
       } else {
         throw new Error("Invalid response");
       }
-    } catch (error) {
+    } catch (error: any) {
       setMessages((prev) => [
         ...prev,
         {
           id: (Date.now() + 1).toString(),
           role: "ai",
-          content: "Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại sau.",
+          content: `Lỗi kết nối: ${error.message || "Không xác định"}`,
         },
       ]);
     } finally {
