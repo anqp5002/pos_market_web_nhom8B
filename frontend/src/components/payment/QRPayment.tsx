@@ -49,18 +49,21 @@ export default function QRPayment({
       <div className="flex flex-col items-center bg-white border-2 border-dashed border-blue-200 rounded-xl p-6 space-y-3">
         {status === "waiting" ? (
           <>
-            {/* QR Code Mock */}
-            <div className="w-48 h-48 bg-gradient-to-br from-gray-100 to-gray-50 rounded-xl flex flex-col items-center justify-center border border-gray-200 relative">
-              <QrCode className="w-24 h-24 text-gray-400" />
-              <p className="text-xs text-gray-400 mt-2 font-medium">MOCK QR CODE</p>
-              {/* Badge VNPay/Momo */}
-              <div className="absolute -top-2 -right-2 bg-purple-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                VNPay
+            {/* QR Code VietQR */}
+            <div className="w-56 h-56 bg-white rounded-xl flex flex-col items-center justify-center border border-gray-200 relative shadow-sm p-2">
+              <img 
+                src={`https://img.vietqr.io/image/970422-0702947309-compact2.jpg?amount=${totalAmount}&addInfo=Thanh toan don hang POS`} 
+                alt="QR Code Thanh Toán"
+                className="w-full h-full object-contain"
+              />
+              {/* Badge VietQR */}
+              <div className="absolute -top-3 -right-3 bg-blue-600 text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md border-2 border-white tracking-wide">
+                Napas247
               </div>
             </div>
 
             <p className="text-sm text-gray-600 text-center">
-              Quét mã QR bằng ứng dụng <span className="font-semibold text-purple-600">VNPay</span> hoặc <span className="font-semibold text-pink-600">MoMo</span>
+              Quét mã QR bằng ứng dụng <span className="font-semibold text-blue-600">Ngân hàng</span> hoặc <span className="font-semibold text-pink-600">MoMo</span>
             </p>
 
             {/* Đếm ngược */}
