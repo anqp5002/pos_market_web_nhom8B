@@ -47,6 +47,36 @@ export const getTopProducts = async (req: Request, res: Response): Promise<void>
   }
 };
 
+/**
+ * GET /api/reports/enhanced-dashboard?date=YYYY-MM-DD
+ * Dashboard nâng cao: doanh thu chia theo phương thức, VAT, doanh thu tháng
+ */
+export const getEnhancedDashboard = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const date = req.query.date ? String(req.query.date) : undefined;
+    const stats = await reportService.getEnhancedDashboardStats(date);
+    res.json({ success: true, data: stats });
+  } catch (err: any) {
+    console.error('Error fetching enhanced dashboard:', err);
+    res.status(500).json({ success: false, message: 'Lỗi lấy thống kê dashboard nâng cao' });
+  }
+};
+
+/**
+ * GET /api/reports/today-shifts?date=YYYY-MM-DD
+ * Lấy danh sách ca làm việc kèm doanh thu và độ lệch
+ */
+export const getTodayShifts = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const date = req.query.date ? String(req.query.date) : undefined;
+    const shifts = await reportService.getTodayShifts(date);
+    res.json({ success: true, data: shifts });
+  } catch (err: any) {
+    console.error('Error fetching today shifts:', err);
+    res.status(500).json({ success: false, message: 'Lỗi lấy báo cáo ca' });
+  }
+};
+
 // GET /api/reports/daily (Sprint 5)
 export const getDaily = async (req: Request, res: Response) => {
   try {

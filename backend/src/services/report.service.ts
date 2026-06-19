@@ -325,6 +325,146 @@ export const getTopSellingProducts = async (limit: number = 10) => {
   return formattedTopProducts;
 };
 
+/**
+ * Thống kê Dashboard nâng cao (giống Desktop)
+ * - Doanh thu hôm nay + chia theo tiền mặt / chuyển khoản
+ * - Số đơn hôm nay (thành công / thất bại)
+ * - Thuế VAT hôm nay
+ * - Doanh thu tháng này
+ * - Số sản phẩm đang kinh doanh
+ */
+export const getEnhancedDashboardStats = async (dateStr?: string) => {
+  const target = dateStr ? new Date(dateStr) : new Date();
+  const startOfDay = new Date(target.getFullYear(), target.getMonth(), target.getDate(), 0, 0, 0);
+  const endOfDay = new Date(target.getFullYear(), target.getMonth(), target.getDate(), 23, 59, 59, 999);
+  const startOfMonth = new Date(target.getFullYear(), target.getMonth(), 1, 0, 0, 0);
+
+  // === Lấy tất cả giao dịch hôm nay (đã thành công) để phân tích ===
+  const todayTransactions = await prisma.giaoDich.findMany({
+    where: {
+      status: 'SUCCESS',
+      donHang: {
+        status: 'COMPLETED',
+        createdAt: { gte: startOfDay, lte: endOfDay },
+      },
+    },
+    include: {
+      pttt: true,
+    },
+  });
+
+  // Phân loại thanh toán
+  let cashTotal = 0;
+  let transferTotal = 0;
+  for (const gd of todayTransactions) {
+    if (gd.pttt.name === 'CASH') {
+      cashTotal += gd.amount;
+    } else {
+      transferTotal += gd.amount;
+    }
+  }
+  const todayRevenue = cashTotal + transferTotal;
+
+  // === Đơn hàng hôm nay ===
+  const [completedOrders, cancelledOrders, totalOrdersToday] = await Promise.all([
+    prisma.donHang.count({ where: { status: 'COMPLETED', createdAt: { gte: startOfDay, lte: endOfDay } } }),
+    prisma.donHang.count({ where: { status: 'CANCELLED', createdAt: { gte: startOfDay, lte: endOfDay } } }),
+    prisma.donHang.count({ where: { createdAt: { gte: startOfDay, lte: endOfDay } } }),
+  ]);
+
+  // === Thuế VAT (8%) ===
+  const vatRate = 0.08;
+  const vatAmount = Math.round(todayRevenue * vatRate);
+
+  // === Doanh thu tháng này ===
+  const monthRevenue = await prisma.donHang.aggregate({
+    _sum: { total: true },
+    where: { status: 'COMPLETED', createdAt: { gte: startOfMonth } },
+  });
+
+  // === Sản phẩm đang kinh doanh ===
+  const totalProducts = await prisma.sanPham.count();
+
+  return {
+    todayRevenue,
+    cashTotal,
+    transferTotal,
+    totalOrdersToday,
+    completedOrders,
+    cancelledOrders,
+    vatAmount,
+    vatRate: vatRate * 100, // 8%
+    monthRevenue: monthRevenue._sum.total || 0,
+    totalProducts,
+  };
+};
+
+/**
+ * Lấy danh sách tất cả ca làm việc của ngày hôm nay
+ * Bao gồm thông tin: nhân viên, giờ mở ca, giờ đóng ca, tiền mở ca,
+ * doanh thu ca, thực thu, độ lệch, trạng thái
+ */
+export const getTodayShifts = async (dateStr?: string) => {
+  const target = dateStr ? new Date(dateStr) : new Date();
+  const startOfDay = new Date(target.getFullYear(), target.getMonth(), target.getDate(), 0, 0, 0);
+  const endOfDay = new Date(target.getFullYear(), target.getMonth(), target.getDate(), 23, 59, 59, 999);
+
+  const shifts = await prisma.caLamViec.findMany({
+    where: {
+      startTime: { gte: startOfDay, lte: endOfDay },
+    },
+    include: {
+      nhanVien: { select: { fullName: true } },
+      donHangs: {
+        where: { status: 'COMPLETED' },
+        include: {
+          giaoDichs: {
+            where: { status: 'SUCCESS' },
+            include: { pttt: true },
+          },
+        },
+      },
+    },
+    orderBy: { startTime: 'desc' },
+  });
+
+  const result = shifts.map((shift) => {
+    // Tính doanh thu ca (tất cả giao dịch)
+    let shiftRevenue = 0;
+    let cashRevenue = 0;
+    for (const order of shift.donHangs) {
+      for (const gd of order.giaoDichs) {
+        shiftRevenue += gd.amount;
+        if (gd.pttt.name === 'CASH') {
+          cashRevenue += gd.amount;
+        }
+      }
+    }
+
+    // Tiền thực thu (closingBalance)
+    const actualCash = shift.closingBalance || 0;
+    // Tiền kỳ vọng = tiền mở ca + doanh thu tiền mặt
+    const expectedCash = shift.openingBalance + cashRevenue;
+    // Độ lệch
+    const deviation = actualCash - expectedCash;
+
+    return {
+      id: shift.id,
+      employeeName: shift.nhanVien.fullName,
+      startTime: shift.startTime,
+      endTime: shift.endTime,
+      openingBalance: shift.openingBalance,
+      shiftRevenue,
+      actualCash,
+      deviation,
+      status: shift.status,
+      totalOrders: shift.donHangs.length,
+    };
+  });
+
+  return result;
+};
+
 export const exportCSV = async (startDateStr?: string, endDateStr?: string): Promise<string> => {
   const where: any = { status: 'COMPLETED' };
 

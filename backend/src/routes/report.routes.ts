@@ -12,6 +12,12 @@ router.get('/sales-chart', reportCtrl.getSalesChart);
 // GET /api/reports/top-products?limit=10&days=30
 router.get('/top-products', reportCtrl.getTopProducts);
 
+// GET /api/reports/enhanced-dashboard - Dashboard nâng cao (tiền mặt/chuyển khoản, VAT, tháng)
+router.get('/enhanced-dashboard', reportCtrl.getEnhancedDashboard);
+
+// GET /api/reports/today-shifts - Báo cáo ca làm việc hôm nay
+router.get('/today-shifts', reportCtrl.getTodayShifts);
+
 // GET /api/reports/daily        - Báo cáo doanh thu hàng ngày
 router.get('/daily', reportCtrl.getDaily);
 
